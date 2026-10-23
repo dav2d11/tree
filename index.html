@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>구조도 암기</title>
 <style>
-:root{ 
+:root{
   --bg:#090b10; --panel:#12151c; --panel2:#181c26; --line:#232937; --line2:#2e3649;
   --text:#e8ebf2; --sub:#8c95a8; --mute:#5b6479;
   --accent:#92a3ff; --accent-bg:rgba(146,163,255,.12);
@@ -360,6 +360,7 @@ body{background:radial-gradient(900px 460px at 50% -160px,#1a2340 0%,transparent
   ::-webkit-scrollbar{width:0;height:0;}
 }
 @media (hover:none){.card:hover{transform:none;}.btn:hover{background:var(--panel3);} .btn-primary:hover{filter:none;}}
+#kbKeeper{position:fixed;left:0;bottom:0;width:1px;height:1px;opacity:0;border:0;padding:0;font-size:16px;pointer-events:none;caret-color:transparent;z-index:-1;}
 </style>
 </head>
 <body>
@@ -529,6 +530,7 @@ body{background:radial-gradient(900px 460px at 50% -160px,#1a2340 0%,transparent
     </div>
   </div>
 </div>
+<input id="kbKeeper" type="text" inputmode="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" tabindex="-1" aria-hidden="true">
 <div id="toast"></div>
 <div class="lightbox hidden" id="trImgLightbox"><img id="trImgLightboxImg" src="" alt=""></div>
 
@@ -1529,7 +1531,18 @@ function renderStudyStep() {
 function finalizeNodeOutcome(node) {
   if (S.mistake) markNodeMistake(S.tree.id, node.id); else markNodeMastered(S.tree.id, node.id);
 }
+/* 터치 기기: 입력칸이 DOM 에서 사라져도 키보드가 내려가지 않도록 '항상 존재하는' 숨김 입력칸이 포커스를 잠시 넘겨받는다 */
+const IS_TOUCH = window.matchMedia('(pointer:coarse)').matches || /iPad|iPhone|Android/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.platform));
+const kbKeeper = $('kbKeeper');
+function keepKeyboard() {
+  if (!IS_TOUCH) return;
+  const a = document.activeElement;
+  if (a && a !== kbKeeper && a.tagName === 'INPUT' && a.closest('#trStudyProgress')) kbKeeper.focus({ preventScroll: true });
+}
+function releaseKeyboard() { if (document.activeElement === kbKeeper) kbKeeper.blur(); }
+['btnTrStudyBackFloat', 'btnTrBackToHub', 'btnDoneHub'].forEach(id => { const b = $(id); if (b) b.addEventListener('click', releaseKeyboard); });
 function drawStudy() {
+  keepKeyboard();
   S.focusEl = null;
   studyView.stateOf = id => nodeState(S.byId.get(id));
   studyView.sync(S.layout, fillStudy, false);
@@ -1548,7 +1561,10 @@ function drawStudy() {
       if (inp) { f = inp; break; }
     }
   }
-  if (f) setTimeout(() => f.focus(), 0);
+  if (f) {
+    if (IS_TOUCH) f.focus({ preventScroll: true });   // 동기 포커스: keeper → 새 입력칸 (키보드 유지)
+    setTimeout(() => { if (document.activeElement !== f && document.contains(f)) f.focus({ preventScroll: true }); }, 0);
+  }
 }
 function fillStudy(el, id) {
   const node = S.byId.get(id), isRoot = id === S.tree.root.id;
