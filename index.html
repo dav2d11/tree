@@ -1,0 +1,2009 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>구조도 암기</title>
+<style>
+:root{
+  --bg:#090b10; --panel:#12151c; --panel2:#181c26; --line:#232937; --line2:#2e3649;
+  --text:#e8ebf2; --sub:#8c95a8; --mute:#5b6479;
+  --accent:#92a3ff; --accent-bg:rgba(146,163,255,.12);
+  --ok:#5fd6a4; --ok-bg:rgba(95,214,164,.10);
+  --bad:#ff7b88; --bad-bg:rgba(255,123,136,.10);
+  --warn:#f0c674;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  margin:0; padding:28px 20px; display:flex; justify-content:center; min-height:100vh;
+  font-family:"Pretendard Variable","Pretendard","Inter","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  background:radial-gradient(1100px 520px at 50% -180px,#182036 0%,transparent 70%),var(--bg);
+  color:var(--text); -webkit-font-smoothing:antialiased;
+}
+.app{width:100%; max-width:1180px;}
+.hidden{display:none !important;}
+::-webkit-scrollbar{width:10px;height:10px;}
+::-webkit-scrollbar-thumb{background:#262d3d;border-radius:10px;border:2px solid transparent;background-clip:content-box;}
+::-webkit-scrollbar-thumb:hover{background:#343d52;background-clip:content-box;border:2px solid transparent;}
+::-webkit-scrollbar-corner{background:transparent;}
+
+/* 아이콘: 굵은 선 SVG */
+.ic{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.7;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+.ic.lg{width:24px;height:24px;}
+
+/* 버튼 */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  font:inherit;font-size:13px;font-weight:600;letter-spacing:-.01em;
+  padding:10px 16px;border-radius:10px;border:1px solid var(--line2);background:transparent;color:var(--text);
+  cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s,color .15s,transform .1s;
+}
+.btn:hover{background:var(--panel2);border-color:#3b4560;}
+.btn:active{transform:translateY(1px);}
+.btn:disabled{opacity:.35;cursor:not-allowed;pointer-events:none;}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#0a0d1c;}
+.btn-primary:hover{background:#a9b6ff;border-color:#a9b6ff;}
+.btn-danger:hover{color:var(--bad);border-color:rgba(255,123,136,.5);background:var(--bad-bg);}
+.btn-sm{padding:7px 12px;font-size:12px;border-radius:8px;}
+.btn-block{width:100%;}
+.btn.icon-only{padding:7px 9px;}
+
+.panel{
+  background:linear-gradient(180deg,var(--panel),#0f1218);
+  border:1px solid var(--line);border-radius:18px;padding:26px;
+}
+.row{display:flex;align-items:center;gap:8px;}
+.spacer{flex:1;}
+h2{margin:0;font-size:17px;font-weight:700;letter-spacing:-.02em;}
+.hint{font-size:12px;color:var(--mute);text-align:center;margin:12px 0 4px;}
+.empty-msg{grid-column:1/-1;color:var(--mute);font-size:13px;text-align:center;padding:48px 0;}
+
+/* 상단 브랜드 */
+.topbar{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding:0 4px;}
+.brand-mark{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;color:var(--accent);background:var(--accent-bg);border:1px solid rgba(146,163,255,.28);}
+.brand-title{font-size:20px;font-weight:800;letter-spacing:-.03em;}
+.brand-sub{font-size:12px;color:var(--sub);margin-top:2px;}
+
+/* 목록 */
+.list-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;}
+.toolbar .btn-primary{flex:1.2;}
+.toolbar .btn:not(.btn-primary){flex:1;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px;margin-top:16px;}
+.card{
+  background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:18px;
+  display:flex;flex-direction:column;gap:10px;cursor:grab;transition:border-color .15s,transform .15s,background .15s;
+}
+.card:hover{border-color:var(--line2);transform:translateY(-2px);}
+.card:active{cursor:grabbing;}
+.card.folder{background:linear-gradient(180deg,#1a1d33,#151828);border-color:#2d3256;}
+.card-title{font-size:15px;font-weight:700;letter-spacing:-.02em;display:flex;align-items:center;gap:10px;line-height:1.35;}
+.card.folder .card-title{color:var(--accent);}
+.card-meta{font-size:12px;color:var(--sub);display:flex;gap:10px;}
+.meta-wrong{color:var(--bad);font-weight:700;}
+.card-actions{display:flex;gap:6px;margin-top:2px;}
+.card-actions .btn{flex:1;}
+.card-actions .btn.icon-only{flex:0 0 auto;}
+.card.dragging{opacity:.35;}
+.card.drop-before{outline:2px solid var(--accent);outline-offset:2px;}
+.card.drop-into{outline:2px dashed var(--accent);outline-offset:2px;background:#202547;}
+#btnTrFolderBack.drop-into{outline:2px dashed var(--accent);background:#202547;}
+
+/* 편집 */
+.form-group{margin-bottom:14px;}
+.form-group label,.col-title{display:block;font-size:12px;color:var(--sub);margin-bottom:7px;font-weight:600;}
+.form-group input{
+  width:100%;padding:11px 13px;border-radius:10px;border:1px solid var(--line2);background:#0a0c12;color:var(--text);
+  font-size:14px;outline:none;font-family:inherit;
+}
+.form-group input:focus,#trOutlineInput:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(146,163,255,.14);}
+.editor{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;}
+#trOutlineInput{
+  width:100%;min-height:440px;background:#0a0c12;border:1px solid var(--line2);color:var(--text);border-radius:12px;
+  padding:14px;font-size:13px;line-height:1.65;font-family:"SFMono-Regular",Menlo,Consolas,monospace;resize:vertical;outline:none;
+}
+.preview{background:#0a0c12;border:1px solid var(--line2);border-radius:12px;padding:10px;height:440px;overflow-y:auto;font-size:13px;}
+.preview-empty{color:var(--mute);text-align:center;padding:60px 0;}
+.pv-row{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:8px;}
+.pv-row:hover{background:rgba(255,255,255,.035);}
+.pv-mark{width:8px;height:8px;border-radius:50%;background:var(--mute);flex-shrink:0;}
+.pv-mark.branch{background:transparent;border:2.5px solid var(--accent);}
+.pv-label{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;gap:8px;}
+.pv-thumb{width:20px;height:20px;object-fit:contain;background:#000;border-radius:5px;border:1px solid var(--line2);}
+.pill{
+  flex-shrink:0;font:inherit;font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;cursor:pointer;
+  background:transparent;border:1px solid var(--line2);color:var(--sub);transition:all .15s;
+}
+.pill:hover{border-color:var(--accent);color:var(--text);}
+.pill.on{border-color:rgba(146,163,255,.5);color:var(--accent);background:var(--accent-bg);}
+.cfg{background:#0e1118;border:1px solid var(--line2);border-radius:10px;padding:12px;margin:4px 0 8px 18px;display:flex;flex-direction:column;gap:10px;}
+.cfg-text{background:#080a0f;border:1px solid var(--line2);border-radius:8px;padding:10px 12px;font-size:15px;line-height:1.9;letter-spacing:.5px;}
+.cfg-char{display:inline-block;cursor:pointer;border-radius:4px;padding:0 1px;transition:background .1s,color .1s;}
+.cfg-char.blank{background:var(--accent-bg);color:var(--accent);font-weight:700;text-decoration:underline;}
+.cfg-char.space{cursor:default;}
+.cfg-preview{font-size:12px;color:var(--ok);}
+.cfg-row{display:flex;gap:6px;}
+.cfg-row .btn{flex:1;}
+.cfg-img{display:flex;align-items:center;gap:12px;}
+.cfg-img img{max-width:160px;max-height:120px;border-radius:8px;border:1px solid var(--line2);object-fit:contain;background:#000;}
+.cfg-empty{color:var(--mute);font-size:12px;}
+
+/* 학습 화면 */
+#screen-tree-study{display:flex;flex-direction:column;height:calc(100vh - 56px);}
+#trHub{display:flex;flex-direction:column;flex:1;min-height:0;}
+.hub-bar{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-shrink:0;flex-wrap:wrap;}
+.hub-summary{font-size:13px;color:var(--sub);}
+.hub-note{font-size:12px;color:var(--mute);margin:-4px 0 12px;flex-shrink:0;}
+
+/* 다이어그램 */
+.dia{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;border-radius:14px;overflow:hidden;}
+.dia:fullscreen{background:var(--bg);padding:16px;}
+.dia:-webkit-full-screen{background:var(--bg);padding:16px;}
+.dia-wrap{
+  position:relative;flex:1;min-height:260px;overflow:auto;cursor:grab;user-select:none;touch-action:none;
+  background:radial-gradient(circle at 1px 1px,#1b2130 1.2px,transparent 0) 0 0/24px 24px,#07090d;
+  border:1px solid var(--line);border-radius:14px;
+}
+.dia-wrap:active{cursor:grabbing;}
+.dia-stage{position:relative;}
+.dia-inner{position:absolute;left:0;top:0;transform-origin:0 0;}
+.dia-svg{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;}
+.dia-svg path{stroke:#3a445b;stroke-width:2.2;fill:none;stroke-linecap:round;}
+
+.node{
+  position:absolute;transform:translate(-50%,-50%);box-sizing:border-box;min-width:56px;padding:8px 11px;border-radius:11px;
+  text-align:center;font-size:12.5px;line-height:1.35;background:#121722;border:1.5px solid #2b3447;color:var(--text);
+  word-break:keep-all;overflow-wrap:anywhere;z-index:2;transition:background .2s,border-color .2s,box-shadow .2s;
+}
+.node .txt{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.node.root{background:#1a1d3b;border-color:#5b66c9;font-weight:700;}
+.node.done{border-color:#2a6b53;background:#0e1f18;}
+.node.pending{border-style:dashed;color:var(--mute);background:#0c1017;}
+.node.context{color:var(--sub);}
+.node.missed{border-color:#8d3b47;background:#26111a;}
+.node.active{
+  border-color:var(--accent);background:#171d2f;box-shadow:0 0 0 4px rgba(146,163,255,.16);z-index:6;
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:2px;
+}
+.node.asking{border-color:var(--accent);box-shadow:0 0 0 4px rgba(146,163,255,.2);}
+.node.clickable{cursor:pointer;}
+.node.clickable:hover{border-color:var(--accent);box-shadow:0 0 0 3px rgba(146,163,255,.16);}
+.node.enter{animation:pop .38s cubic-bezier(.2,.8,.2,1);}
+@keyframes pop{from{opacity:0;scale:.82;}to{opacity:1;scale:1;}}
+@keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+.node .thumb{display:block;width:96px;height:76px;object-fit:contain;background:#000;border-radius:7px;margin:0 auto 5px;border:1px solid var(--line2);cursor:zoom-in;}
+.in-blank,.in-group{
+  background:transparent;border:none;border-bottom:2px solid var(--accent);color:var(--text);text-align:center;
+  font-size:12.5px;outline:none;padding:1px 2px;font-family:inherit;
+}
+.in-blank{min-width:26px;max-width:260px;}
+.in-group{width:100%;}
+.in-blank.correct{border-bottom-color:var(--ok);color:var(--ok);}
+.in-blank.wrong,.in-group.wrong{border-bottom-color:var(--bad);animation:shake .26s;}
+.dot-wrong,.dot-child{
+  position:absolute;width:17px;height:17px;border-radius:999px;font-size:9px;font-weight:800;border:2px solid #0a0c12;
+  display:flex;align-items:center;justify-content:center;z-index:7;
+}
+.dot-wrong{top:-8px;right:-8px;background:var(--bad);color:#fff;}
+.dot-child{bottom:-8px;right:-8px;background:var(--warn);color:#3a2705;}
+
+/* 줌바 / 미니맵 */
+.zoom-bar{
+  position:absolute;top:12px;right:14px;z-index:30;display:flex;align-items:center;gap:2px;
+  background:rgba(14,17,24,.9);border:1px solid var(--line2);border-radius:11px;padding:4px;backdrop-filter:blur(8px);
+  box-shadow:0 8px 24px rgba(0,0,0,.4);
+}
+.zb{
+  background:transparent;border:none;color:var(--text);border-radius:7px;min-width:30px;height:30px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;padding:0 6px;font:inherit;font-size:11px;font-weight:700;transition:background .15s;
+}
+.zb:hover{background:var(--panel2);}
+.zb.label{color:var(--accent);min-width:48px;}
+.minimap{
+  position:absolute;bottom:14px;right:14px;z-index:30;width:200px;background:rgba(14,17,24,.92);
+  border:1px solid var(--line2);border-radius:12px;overflow:hidden;backdrop-filter:blur(8px);box-shadow:0 10px 30px rgba(0,0,0,.5);
+}
+.minimap.collapsed .mm-body{display:none;}
+.mm-head{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;font-size:11px;font-weight:700;color:var(--sub);cursor:pointer;user-select:none;border-bottom:1px solid rgba(255,255,255,.06);}
+.minimap.collapsed .mm-head{border-bottom:none;}
+.mm-head:hover{color:var(--text);}
+.mm-body{height:120px;background:#06080c;cursor:crosshair;}
+.mm-svg{width:100%;height:100%;display:block;touch-action:none;}
+.mm-e{stroke:#2a3347;stroke-width:3;fill:none;stroke-linecap:round;}
+.mm-n{fill:#1b2130;stroke:#323b50;stroke-width:1.5;}
+.mm-n.done{fill:#12342a;stroke:#2e7a5c;}
+.mm-n.active{fill:#3441b0;stroke:var(--accent);stroke-width:3;}
+.mm-n.pending{fill:#141925;stroke:#2a3347;}
+.mm-n.missed{fill:#3a1721;stroke:#9a404d;}
+.mm-n.root{fill:#272a5a;stroke:#7a86e6;stroke-width:2.5;}
+.mm-vp{fill:rgba(146,163,255,.14);stroke:var(--accent);stroke-width:2;rx:3px;}
+
+/* 몰입 학습 오버레이 */
+#trStudyProgress{display:flex;flex-direction:column;position:fixed;inset:0;z-index:200;background:var(--bg);}
+#trStudyProgress .dia{border-radius:0;}
+#trStudyProgress .dia-wrap{border-radius:0;border:none;}
+.study-progress{position:absolute;top:0;left:0;right:0;height:3px;z-index:60;background:rgba(255,255,255,.07);}
+.study-progress div{height:100%;background:linear-gradient(90deg,var(--accent),#c4a8ff);transition:width .3s ease;}
+.study-actions{position:absolute;top:14px;left:16px;z-index:60;display:flex;gap:8px;align-items:center;}
+.study-actions .btn{background:rgba(14,17,24,.88);backdrop-filter:blur(8px);}
+.chip{
+  display:none;font-size:12px;font-weight:700;color:var(--sub);padding:8px 14px;border-radius:10px;
+  background:rgba(14,17,24,.88);border:1px solid var(--line2);backdrop-filter:blur(8px);
+}
+.study-feedback{
+  position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:60;font-size:13px;font-weight:600;padding:8px 18px;border-radius:999px;
+  background:rgba(14,17,24,.9);border:1px solid var(--line2);backdrop-filter:blur(8px);pointer-events:none;max-width:60vw;text-align:center;
+  opacity:0;transition:opacity .15s;
+}
+.study-feedback:not(:empty){opacity:1;}
+.fb.ok{color:var(--ok);} .fb.bad{color:var(--bad);} .fb.warn{color:var(--warn);}
+
+.blank-bar{
+  display:none;flex-shrink:0;width:100%;
+  background:var(--panel);border-top:1px solid var(--line2);padding:14px 20px 16px;
+}
+.blank-bar .blank-inner{width:min(640px,100%);margin:0 auto;}
+.blank-caption{font-size:12px;color:var(--sub);margin-bottom:9px;}
+.blank-caption b{color:var(--accent);font-weight:700;}
+.blank-bar input{
+  width:100%;background:#080a0f;border:1px solid var(--line2);color:var(--text);border-radius:11px;padding:13px 15px;
+  font-size:15px;outline:none;font-family:inherit;transition:border-color .15s,box-shadow .15s;
+}
+.blank-bar input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(146,163,255,.15);}
+.blank-bar input:disabled{opacity:.45;}
+.blank-bar input.wrong{border-color:var(--bad);animation:shake .28s;}
+.blank-keys{margin-top:9px;font-size:11px;color:var(--mute);display:flex;gap:16px;}
+kbd{font:inherit;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:6px;border:1px solid var(--line2);background:var(--panel2);color:var(--sub);margin-right:5px;}
+#trStudyProgress.mode-blank .study-progress{display:none;}
+#trStudyProgress.mode-blank .blank-bar{display:block;}
+#trStudyProgress.mode-blank .chip{display:block;}
+#trStudyProgress.mode-blank #btnZbTarget{display:none;}
+@media (max-width:900px){ .editor{grid-template-columns:1fr;} }
+
+/* 모달 / 토스트 / 라이트박스 / 드롭 */
+.modal{position:fixed;inset:0;z-index:9000;background:rgba(5,7,10,.72);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;}
+.modal-card{background:var(--panel);border:1px solid var(--line2);border-radius:18px;padding:28px;width:min(400px,90vw);text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.6);}
+.modal-title{font-size:18px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px;}
+.modal-stats{font-size:13px;color:var(--sub);margin-bottom:22px;line-height:1.7;}
+.modal-stats b{font-size:22px;font-weight:800;display:block;margin-bottom:4px;color:var(--text);}
+.modal-stats .ok{color:var(--ok);} .modal-stats .bad{color:var(--bad);}
+.modal-card .row{justify-content:center;}
+#toast{
+  position:fixed;left:50%;bottom:34px;transform:translate(-50%,16px);z-index:9500;background:#1b2030;border:1px solid var(--line2);
+  color:var(--text);font-size:13px;font-weight:600;padding:11px 20px;border-radius:12px;opacity:0;pointer-events:none;
+  transition:opacity .2s,transform .2s;box-shadow:0 12px 36px rgba(0,0,0,.5);max-width:80vw;
+}
+#toast.show{opacity:1;transform:translate(-50%,0);}
+.lightbox{position:fixed;inset:0;z-index:9800;background:rgba(0,0,0,.86);display:flex;align-items:center;justify-content:center;cursor:zoom-out;padding:24px;}
+.lightbox img{max-width:92vw;max-height:92vh;border-radius:12px;box-shadow:0 10px 50px rgba(0,0,0,.6);}
+#dropOverlay{
+  position:fixed;inset:0;z-index:9900;background:rgba(9,11,16,.88);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;
+  pointer-events:none;opacity:0;transition:opacity .2s;
+}
+#dropOverlay.active{opacity:1;pointer-events:all;}
+.drop-box{background:var(--panel);border:2px dashed var(--accent);border-radius:24px;padding:44px 56px;text-align:center;max-width:540px;width:90%;}
+.drop-box .ic{width:44px;height:44px;color:var(--accent);margin-bottom:14px;}
+.drop-title{font-size:19px;font-weight:800;color:var(--accent);margin-bottom:8px;}
+.drop-sub{font-size:13px;color:var(--sub);line-height:1.6;}
+@media (prefers-reduced-motion:reduce){ *{animation:none !important;transition:none !important;} }
+
+/* =========================================================================
+ * v2 디자인: 테두리 제거 · 면(tonal) 위주 · 부드러운 그림자 / 모바일(iPhone 12 mini 375px)
+ * ========================================================================= */
+:root{--r:14px;--sh:0 1px 2px rgba(0,0,0,.28),0 8px 24px -8px rgba(0,0,0,.45);--panel2:#161a24;--panel3:#1d2230;}
+body{background:radial-gradient(900px 460px at 50% -160px,#1a2340 0%,transparent 70%),var(--bg);}
+.btn,.btn-sm,.pill,.chip,.cfg,.cfg-text,.cfg-char,.brand-mark,.form-group input,#trOutlineInput,.preview,.pv-row,.pv-thumb,.mm-head,
+.minimap,.zoom-bar,.zb,.modal-card,.blank-bar input,.in-blank,.in-group,kbd,.drop-box,.node,.node .thumb,.lightbox img,.card{border-color:transparent !important;}
+.btn{background:var(--panel3);border-radius:12px;box-shadow:none;}
+.btn:hover{background:#262d40;}
+.btn-primary{background:linear-gradient(135deg,#8c9dff,#a58bff);color:#0b0d16;}
+.btn-primary:hover{filter:brightness(1.08);background:linear-gradient(135deg,#8c9dff,#a58bff);}
+.btn-danger{background:var(--bad-bg);color:var(--bad);}
+.btn-danger:hover{background:rgba(255,123,136,.2);}
+.card{background:var(--panel2);border-radius:18px;box-shadow:var(--sh);padding:20px;}
+.card:hover{background:#1a1f2c;transform:translateY(-2px);}
+.card.folder{background:linear-gradient(160deg,#1c2040,#151829);}
+.card.drop-before{outline:2px solid var(--accent) !important;}
+.form-group input,#trOutlineInput,.preview,.blank-bar input{background:var(--panel2);border-radius:12px;}
+.form-group input:focus,#trOutlineInput:focus,.blank-bar input:focus{box-shadow:0 0 0 2px rgba(146,163,255,.45);}
+.pill,.cfg,.cfg-text,.cfg-char{background:var(--panel3);}
+.pill.on{background:var(--accent-bg);color:var(--accent);}
+.modal-card{background:var(--panel2);border-radius:22px;}
+.dia-wrap{background:#0c0f16;border:none !important;border-radius:18px;}
+.minimap,.zoom-bar{background:rgba(22,26,36,.82);backdrop-filter:blur(10px);box-shadow:var(--sh);border-radius:12px;}
+.mm-head{border-bottom:none !important;}
+.node{background:#171b27;box-shadow:0 2px 10px rgba(0,0,0,.35);}
+.node.root{background:#232859;}
+.node.done{background:#12281f;box-shadow:0 0 0 1.5px rgba(95,214,164,.35);}
+.node.pending{background:#10141d;box-shadow:none;}
+.node.missed{background:#2c121d;box-shadow:0 0 0 1.5px rgba(255,123,136,.4);}
+.node.asking{background:#1f2447;box-shadow:0 0 0 3px rgba(146,163,255,.4),0 0 24px rgba(146,163,255,.18);}
+.in-blank{background:#0b0e15;}
+.in-blank.correct{background:var(--ok-bg);color:var(--ok);}
+.in-blank.wrong,.in-group.wrong,.blank-bar input.wrong{background:var(--bad-bg);}
+.dia-svg path{stroke:#2d364b;}
+.study-actions .btn{background:rgba(20,24,34,.8);}
+.card-actions .btn.icon-only{padding:10px 12px;}
+
+/* --- 모바일: iPhone 12 mini (375×812) 기준 --- */
+@media (max-width:600px){
+  html{-webkit-text-size-adjust:100%;}
+  body{padding:calc(14px + env(safe-area-inset-top)) 14px calc(20px + env(safe-area-inset-bottom));display:block;min-height:100dvh;}
+  .topbar{margin-bottom:14px;gap:12px;}
+  .brand-mark{width:38px;height:38px;border-radius:12px;}
+  .brand-title{font-size:18px;} .brand-sub{display:none;}
+  .list-head{margin-bottom:12px;gap:10px;} .list-head h2{font-size:17px;margin:0;}
+  .toolbar{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .toolbar .btn{width:100%;min-height:46px;font-size:13px;padding:10px 8px;}
+  .toolbar .btn-primary{grid-column:1 / -1;}
+  .grid{grid-template-columns:1fr;gap:12px;margin-top:14px;}
+  .card{padding:18px;border-radius:20px;}
+  .card-actions{gap:8px;} .card-actions .btn{min-height:44px;padding:10px 6px;}
+  .btn,.pill{min-height:44px;}
+  .btn-sm{min-height:40px;padding:8px 12px;}
+  .form-group input,#trOutlineInput,.blank-bar input{font-size:16px;}   /* iOS 입력 확대 방지 */
+  #trOutlineInput{min-height:240px;}
+  .preview{height:320px;}
+  .editor{gap:14px;}
+  .hub-bar .btn{flex:1 1 calc(50% - 5px);} .hub-bar .btn-primary{flex-basis:100%;}
+  .hub-summary{flex-basis:100%;}
+  .zoom-bar{transform:scale(.92);transform-origin:right bottom;}
+  .minimap{display:none;}
+  .study-actions{top:calc(12px + env(safe-area-inset-top));left:12px;gap:6px;}
+  .study-actions .btn{min-height:38px;padding:7px 11px;font-size:12px;}
+  .study-feedback{font-size:13px;}
+  .blank-bar{padding:10px 12px calc(12px + env(safe-area-inset-bottom)) !important;background:rgba(14,17,24,.92);backdrop-filter:blur(14px);}
+  .blank-bar input{min-height:48px;border-radius:14px;}
+  .modal-card{padding:24px;width:min(340px,90vw);border-radius:24px;}
+  #toast{bottom:calc(24px + env(safe-area-inset-bottom));max-width:88vw;}
+  ::-webkit-scrollbar{width:0;height:0;}
+}
+@media (hover:none){.card:hover{transform:none;}.btn:hover{background:var(--panel3);} .btn-primary:hover{filter:none;}}
+</style>
+</head>
+<body>
+
+<!-- SVG 아이콘 스프라이트 (굵은 선) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-logo" viewBox="0 0 24 24"><path d="M5 12h5M10 12c3 0 3-6 6-6h3M10 12c3 0 3 6 6 6h3"/><circle cx="4" cy="12" r="1.2"/><circle cx="20" cy="6" r="1.2"/><circle cx="20" cy="18" r="1.2"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+    <symbol id="i-import" viewBox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z"/></symbol>
+    <symbol id="i-repeat" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14-4M4 4v4h4M4 13a8 8 0 0 0 14 4M20 20v-4h-4"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"/></symbol>
+    <symbol id="i-blank" viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6zM15 3v4h4"/></symbol>
+    <symbol id="i-out" viewBox="0 0 24 24"><path d="M12 16V5M7 9l5-5 5 5M5 20h14"/></symbol>
+    <symbol id="i-fit" viewBox="0 0 24 24"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/></symbol>
+    <symbol id="i-full" viewBox="0 0 24 24"><path d="M9 4H4v5M15 4h5v5M9 20H4v-5M15 20h5v-5"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></symbol>
+  </defs>
+</svg>
+
+<div id="dropOverlay">
+  <div class="drop-box">
+    <svg class="ic"><use href="#i-import"/></svg>
+    <div class="drop-title">마크다운(.md) 파일을 여기에 놓으세요</div>
+  </div>
+</div>
+
+<div class="app">
+
+  <!-- 1) 목록 -->
+  <section id="screen-tree-list">
+    <header class="topbar">
+      <div class="brand-mark"><svg class="ic lg"><use href="#i-logo"/></svg></div>
+      <div>
+        <div class="brand-title">구조도 암기</div>
+      </div>
+    </header>
+    <div class="panel">
+      <div class="list-head">
+        <div class="row">
+          <button class="btn btn-sm hidden" id="btnTrFolderBack"><svg class="ic"><use href="#i-back"/></svg>전체 목록</button>
+          <h2 id="trListTitle">내 구조도</h2>
+        </div>
+      </div>
+      <div class="toolbar">
+        <button class="btn btn-primary" id="btnTrNew"><svg class="ic"><use href="#i-plus"/></svg>새 구조도</button>
+        <button class="btn" id="btnTrNewFolder"><svg class="ic"><use href="#i-folder"/></svg>새 폴더</button>
+        <button class="btn" id="btnTrImportMd"><svg class="ic"><use href="#i-import"/></svg>MD 불러오기</button>
+        <button class="btn" id="btnTrImportDir"><svg class="ic"><use href="#i-folder"/></svg>폴더 불러오기</button>
+        <button class="btn" id="btnTrExportAll"><svg class="ic"><use href="#i-out"/></svg>전체 내보내기</button>
+        <input type="file" id="trMdFileInput" accept=".md,.markdown,.txt,.zip" multiple class="hidden">
+        <input type="file" id="trMdDirInput" webkitdirectory directory multiple class="hidden">
+      </div>
+      <div class="grid" id="trGrid"></div>
+    </div>
+  </section>
+
+  <!-- 2) 편집 -->
+  <section id="screen-tree-edit" class="panel hidden">
+    <div class="list-head">
+      <h2>구조도 편집</h2>
+      <div class="row">
+        <button class="btn btn-sm" id="btnTrEditStudy"><svg class="ic"><use href="#i-play"/></svg>학습</button>
+        <button class="btn btn-sm" id="btnTrEditBack"><svg class="ic"><use href="#i-back"/></svg>뒤로</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>구조도 이름</label>
+      <input type="text" id="trTitleInput">
+    </div>
+    <div class="editor">
+      <div>
+        <span class="col-title">마크다운 개요</span>
+        <textarea id="trOutlineInput" placeholder="들여쓰기로 계층을 만듭니다.&#10;빈칸으로 만들 부분은 [[ ]]로 감싸세요.&#10;&#10;예)&#10;- 고구려&#10;  - [[졸본]]건국&#10;  - 장수왕 [[평양]] 천도"></textarea>
+        <button class="btn btn-primary btn-block" id="btnTrParse" style="margin-top:10px;">구조도 만들기 / 갱신</button>
+      </div>
+      <div>
+        <span class="col-title">미리보기 (사진과 부분 빈칸을 노드별로 지정)</span>
+        <div class="preview" id="trPreview"></div>
+        <button class="btn btn-primary btn-block" id="btnTrSave" style="margin-top:10px;">저장</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3) 학습 -->
+  <section id="screen-tree-study" class="panel hidden">
+    <div class="list-head" id="trStudyHeader">
+      <h2 id="trStudyTitle">구조도 학습</h2>
+      <button class="btn btn-sm" id="btnTrStudyBack"><svg class="ic"><use href="#i-back"/></svg>목록으로</button>
+    </div>
+
+    <div id="trHub">
+      <div class="hub-bar">
+        <span class="hub-summary" id="trHubSummary"></span>
+        <span class="spacer"></span>
+        <button class="btn btn-primary" id="btnTrStudyAll"><svg class="ic"><use href="#i-play"/></svg>전체 학습</button>
+        <button class="btn" id="btnTrStudyBlank"><svg class="ic"><use href="#i-blank"/></svg>백지 학습</button>
+        <button class="btn" id="btnTrStudyWrong"><svg class="ic"><use href="#i-repeat"/></svg><span id="trWrongLabel">오답만 재학습</span></button>
+      </div>
+      <div class="dia">
+        <div class="dia-wrap" id="trHubWrap">
+          <div class="dia-stage" id="trHubStage"><div class="dia-inner" id="trHubInner"><svg class="dia-svg" id="trHubSvg"></svg></div></div>
+        </div>
+        <div class="zoom-bar" id="trHubZoom">
+          <button class="zb" data-act="in" title="확대"><svg class="ic"><use href="#i-plus"/></svg></button>
+          <button class="zb" data-act="out" title="축소"><svg class="ic"><use href="#i-minus"/></svg></button>
+          <button class="zb label" data-act="reset" title="100%">100%</button>
+          <button class="zb" data-act="fit" title="화면에 맞추기"><svg class="ic"><use href="#i-fit"/></svg></button>
+          <button class="zb" data-act="fullscreen" title="전체화면"><svg class="ic"><use href="#i-full"/></svg></button>
+        </div>
+        <div class="minimap" id="trHubMm">
+          <div class="mm-head"><span>미니맵</span><svg class="ic"><use href="#i-down"/></svg></div>
+          <div class="mm-body"><svg class="mm-svg" id="trHubMmSvg"></svg></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="trStudyProgress" class="hidden">
+      <div class="study-progress"><div id="trStudyBar" style="width:0%"></div></div>
+      <div class="study-actions">
+        <button class="btn btn-sm" id="btnTrStudyBackFloat"><svg class="ic"><use href="#i-back"/></svg>목록으로</button>
+        <button class="btn btn-sm" id="btnTrBackToHub"><svg class="ic"><use href="#i-fit"/></svg>개요로</button>
+        <span class="chip" id="trBlankCount"></span>
+      </div>
+      <div class="study-feedback" id="trStudyFeedback"></div>
+
+      <div class="dia" style="flex:1;">
+        <div class="dia-wrap" id="trStudyWrap">
+          <div class="dia-stage" id="trStudyStage"><div class="dia-inner" id="trStudyInner"><svg class="dia-svg" id="trStudySvg"></svg></div></div>
+        </div>
+        <div class="zoom-bar" id="trStudyZoom">
+          <button class="zb" data-act="in" title="확대"><svg class="ic"><use href="#i-plus"/></svg></button>
+          <button class="zb" data-act="out" title="축소"><svg class="ic"><use href="#i-minus"/></svg></button>
+          <button class="zb label" data-act="reset" title="100%">100%</button>
+          <button class="zb" data-act="fit" title="화면에 맞추기"><svg class="ic"><use href="#i-fit"/></svg></button>
+          <button class="zb" data-act="target" id="btnZbTarget" title="현재 문제로 이동"><svg class="ic"><use href="#i-target"/></svg></button>
+          <button class="zb" data-act="fullscreen" title="전체화면"><svg class="ic"><use href="#i-full"/></svg></button>
+        </div>
+        <div class="minimap" id="trStudyMm">
+          <div class="mm-head"><span>미니맵</span><svg class="ic"><use href="#i-down"/></svg></div>
+          <div class="mm-body"><svg class="mm-svg" id="trStudyMmSvg"></svg></div>
+        </div>
+      </div>
+
+      <div class="blank-bar" id="trBlankBar"><div class="blank-inner">
+        <div class="blank-caption" id="trBlankCaption"></div>
+        <input type="text" id="trBlankInput" autocomplete="off" spellcheck="false">
+      </div></div>
+    </div>
+  </section>
+</div>
+
+<div class="modal hidden" id="trDoneModal">
+  <div class="modal-card">
+    <div class="modal-title">백지 학습 완료</div>
+    <div class="modal-stats" id="trDoneStats"></div>
+    <div class="row">
+      <button class="btn btn-primary" id="btnDoneHub">개요로</button>
+      <button class="btn" id="btnDoneAgain">다시 백지 학습</button>
+    </div>
+  </div>
+</div>
+<div id="toast"></div>
+<div class="lightbox hidden" id="trImgLightbox"><img id="trImgLightboxImg" src="" alt=""></div>
+
+<script>
+'use strict';
+/* =========================================================================
+ * 0. 공용 유틸
+ * ========================================================================= */
+const $ = id => document.getElementById(id);
+const NS = 'http://www.w3.org/2000/svg';
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const icon = (n, cls = '') => `<svg class="ic ${cls}"><use href="#i-${n}"/></svg>`;
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+let toastTimer = null;
+function toast(msg) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+/* =========================================================================
+ * 1. 저장소 (window.storage + IndexedDB + localStorage) - 저장 키/형식은 기존과 동일
+ * ========================================================================= */
+const KEY_TREES = 'quiz_trees';
+const KEY_WRONG = 'quiz_tree_wrong_nodes';
+const KEY_FOLDERS = 'quiz_tree_folders';
+let TREES = {}, TREE_WRONG = {}, TREE_FOLDERS = {};
+// TreeNode = { id, label, children, blankMask, image }
+
+const DB_NAME = 'TypingQuizDB', DB_VERSION = 1, STORE = 'keyval';
+let dbPromise = null;
+function getDB() {
+  if (!dbPromise) dbPromise = new Promise(resolve => {
+    if (!window.indexedDB) return resolve(null);
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = e => { const db = e.target.result; if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE); };
+    req.onsuccess = e => resolve(e.target.result);
+    req.onerror = () => resolve(null);
+  });
+  return dbPromise;
+}
+async function idbGet(key) {
+  try {
+    const db = await getDB(); if (!db) return null;
+    return await new Promise(res => {
+      const r = db.transaction(STORE, 'readonly').objectStore(STORE).get(key);
+      r.onsuccess = () => res(r.result !== undefined ? r.result : null);
+      r.onerror = () => res(null);
+    });
+  } catch (e) { return null; }
+}
+async function idbSet(key, value) {
+  try {
+    const db = await getDB(); if (!db) return false;
+    return await new Promise(res => {
+      const r = db.transaction(STORE, 'readwrite').objectStore(STORE).put(value, key);
+      r.onsuccess = () => res(true); r.onerror = () => res(false);
+    });
+  } catch (e) { return false; }
+}
+async function loadFromStorage(key) {
+  try {
+    if (window.storage && window.storage.get) {
+      const res = await window.storage.get(key, false);
+      if (res && res.value) return JSON.parse(res.value);
+    }
+  } catch (e) {}
+  const val = await idbGet(key);
+  if (val !== null) { try { return typeof val === 'string' ? JSON.parse(val) : val; } catch (e) {} }
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw) { const parsed = JSON.parse(raw); idbSet(key, parsed); return parsed; }
+  } catch (e) {}
+  return null;
+}
+async function saveToStorage(key, obj) {
+  const json = JSON.stringify(obj);
+  try { localStorage.setItem(key, json); } catch (e) {}   // 동기 저장을 먼저(페이지 종료 대비)
+  try { if (window.storage && window.storage.set) await window.storage.set(key, json, false); } catch (e) {}
+  await idbSet(key, obj);
+}
+const saveTrees = () => saveToStorage(KEY_TREES, TREES);
+const saveTreeWrong = () => saveToStorage(KEY_WRONG, TREE_WRONG);
+const saveTreeFolders = () => saveToStorage(KEY_FOLDERS, TREE_FOLDERS);
+let wrongTimer = null;
+function saveTreeWrongSoon() { clearTimeout(wrongTimer); wrongTimer = setTimeout(() => { wrongTimer = null; saveTreeWrong(); }, 400); }
+window.addEventListener('pagehide', () => { if (wrongTimer) { clearTimeout(wrongTimer); wrongTimer = null; saveTreeWrong(); } });
+
+/* =========================================================================
+ * 2. 오답 추적
+ * ========================================================================= */
+function markNodeMistake(treeId, nodeId) {
+  const m = TREE_WRONG[treeId] || (TREE_WRONG[treeId] = {});
+  const cur = m[nodeId] || { miss: 0, lastAt: 0 };
+  cur.miss += 1; cur.lastAt = Date.now();
+  m[nodeId] = cur;
+  saveTreeWrongSoon();
+}
+function markNodeMastered(treeId, nodeId) {
+  const m = TREE_WRONG[treeId];
+  if (m && m[nodeId]) {
+    delete m[nodeId];
+    if (!Object.keys(m).length) delete TREE_WRONG[treeId];
+    saveTreeWrongSoon();
+  }
+}
+const getWrongMap = id => TREE_WRONG[id] || {};
+const getWrongCount = id => Object.keys(getWrongMap(id)).length;
+function pruneStaleWrongEntries(tree) {
+  const wm = TREE_WRONG[tree.id]; if (!wm) return false;
+  const valid = new Set(flattenTreeDFS(tree.root).map(n => n.id));
+  let changed = false;
+  for (const id of Object.keys(wm)) if (!valid.has(id)) { delete wm[id]; changed = true; }
+  if (!Object.keys(wm).length) delete TREE_WRONG[tree.id];
+  return changed;
+}
+function getWrongNodeList(tree) {
+  const wm = getWrongMap(tree.id);
+  const found = flattenTreeBFS(tree.root).filter(x => wm[x.node.id]);
+  found.sort((a, b) => (wm[b.node.id].miss - wm[a.node.id].miss) || (a.depth - b.depth));
+  return found;
+}
+
+/* =========================================================================
+ * 3. 정답 판정
+ * ========================================================================= */
+const normalize = s => String(s || '').replace(/\s+/g, '').toLowerCase();
+const cleanText = s => String(s || '').replace(/[\s.,/·~+_\-–—()[\]{}!?:;'"“”‘’`]+/g, '').toLowerCase();
+function extractKeywords(s) {
+  return String(s || '').trim().split(/[\s,()[\]{}·/\\~+\-_:;'"“”‘’`]+/).map(cleanText).filter(k => k.length > 0);
+}
+function singleMatch(typedRaw, targetRaw) {
+  const tn = normalize(typedRaw), gn = normalize(targetRaw);
+  if (!gn || !tn) return false;
+  if (tn === gn || tn.includes(gn)) return true;
+  const tc = cleanText(typedRaw), gc = cleanText(targetRaw);
+  if (tc && gc && (tc === gc || tc.includes(gc))) return true;
+  const kws = extractKeywords(targetRaw);
+  if (kws.length >= 2) {
+    let last = 0;
+    for (const kw of kws) {
+      const idx = tc.indexOf(kw, last);
+      if (idx === -1) return false;
+      last = idx + kw.length;
+    }
+    return true;
+  }
+  return false;
+}
+
+/* =========================================================================
+ * 4. 부분 빈칸 유틸
+ * ========================================================================= */
+const defaultBlankMask = label => '1'.repeat(label.length);
+const getBlankMask = n => (n.blankMask && n.blankMask.length === n.label.length) ? n.blankMask : defaultBlankMask(n.label);
+function buildBlankSegments(label, mask) {
+  const out = []; let i = 0;
+  while (i < label.length) {
+    const bit = mask[i]; let j = i;
+    while (j < label.length && mask[j] === bit) j++;
+    const text = label.slice(i, j);
+    out.push({ blank: bit === '1' && text.trim() !== '', text });
+    i = j;
+  }
+  return out;
+}
+
+/* =========================================================================
+ * 5. 트리 구조 / 파서
+ * ========================================================================= */
+const uid = p => p + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 9);
+const genTreeId = () => uid('tr_'), genNodeId = () => uid('n_'), genFolderId = () => uid('fld_');
+const makeTreeNode = label => ({ id: genNodeId(), label, children: [], blankMask: null, image: null });
+
+/* "[[졸본]]건국" → label "졸본건국", mask "110 0"(1=빈칸). 괄호가 없으면 mask=null */
+function extractBracketBlanks(raw) {
+  if (!/\[\[[\s\S]*?\]\]/.test(raw)) return { label: raw, mask: null };
+  let label = '', mask = '', last = 0, m, found = false;
+  const re = /\[\[([\s\S]*?)\]\]/g;
+  while ((m = re.exec(raw))) {
+    const before = raw.slice(last, m.index);
+    label += before; mask += '0'.repeat(before.length);
+    label += m[1]; mask += '1'.repeat(m[1].length);
+    if (m[1].trim()) found = true;
+    last = m.index + m[0].length;
+  }
+  const rest = raw.slice(last);
+  label += rest; mask += '0'.repeat(rest.length);
+  return { label, mask: found ? mask : null };
+}
+function parseOutlineToTree(text) {
+  const root = makeTreeNode('루트');
+  const stack = [{ level: 0, node: root }];
+  let lastHeader = 0;
+  for (const raw of String(text || '').split('\n')) {
+    if (!raw.trim()) continue;
+    const line = raw.replace(/\r$/, '');
+    let level, label;
+    const hm = line.match(/^(#{1,6})\s+(.*)$/);
+    const bm = line.match(/^([\t ]*)[-*]\s+(.*)$/);
+    if (hm) { level = hm[1].length; label = hm[2].trim(); lastHeader = level; }
+    else if (bm) {
+      let units = 0, sp = 0;
+      for (const ch of bm[1]) { if (ch === '\t') units++; else if (ch === ' ') sp++; }
+      units += Math.floor(sp / 2);
+      level = lastHeader + units + 1; label = bm[2].trim();
+    } else { level = lastHeader + 1; label = line.trim(); }
+    if (!label) continue;
+    const bm2 = extractBracketBlanks(label);   // [[정답]] 표기 → 해당 글자만 빈칸
+    label = bm2.label;
+    if (!label) continue;
+    while (stack.length > 1 && stack[stack.length - 1].level >= level) stack.pop();
+    const node = makeTreeNode(label);
+    if (bm2.mask) { node.blankMask = bm2.mask; node.bracket = true; }
+    stack[stack.length - 1].node.children.push(node);
+    stack.push({ level, node });
+  }
+  return root;
+}
+const pathKey = chain => chain.join(' > ');
+function mergeTreeAttachments(newRoot, oldRoot) {
+  if (!oldRoot) return;
+  const oldMap = {};
+  (function walk(n, chain) {
+    const c = chain.concat([n.label]); oldMap[pathKey(c)] = n;
+    n.children.forEach(k => walk(k, c));
+  })(oldRoot, []);
+  (function walk(n, chain) {
+    const c = chain.concat([n.label]); const old = oldMap[pathKey(c)];
+    if (old) { n.id = old.id; if (!n.blankMask && old.blankMask && !old.bracket) n.blankMask = old.blankMask; if (old.image) n.image = old.image; }
+    n.children.forEach(k => walk(k, c));
+  })(newRoot, []);
+}
+function flattenTreeDFS(root) {
+  const out = [];
+  (function walk(n) { n.children.forEach(c => { out.push(c); walk(c); }); })(root);
+  return out;
+}
+function flattenTreeBFS(root) {
+  const out = []; const q = root.children.map(c => ({ node: c, depth: 1 }));
+  for (let i = 0; i < q.length; i++) {
+    out.push(q[i]);
+    q[i].node.children.forEach(c => q.push({ node: c, depth: q[i].depth + 1 }));
+  }
+  return out;
+}
+
+/* =========================================================================
+ * 6. 레이아웃 (가로 마인드맵) - 순수 함수. 어떤 서브셋 트리에도 적용 가능
+ * ========================================================================= */
+const NODE_H = 44, SIB_GAP = 18, COL_GAP = 72, PAD = 48, THUMB_W = 96, THUMB_H = 76, THUMB_GAP = 5;
+function estimateNodeWidth(label, hasImage) {
+  let w = 0;
+  for (const ch of String(label)) w += /[\x00-\x7f]/.test(ch) ? 7.2 : 13.5;
+  const tw = Math.min(168, Math.max(56, Math.round(w) + 24));
+  return hasImage ? Math.max(tw, THUMB_W + 16) : tw;
+}
+const ownHeight = n => NODE_H + (n.image ? THUMB_H + THUMB_GAP : 0);
+
+function computeLayout(root, title) {
+  const H = new Map(), W = new Map(), colW = [];
+  (function f(n) {
+    let t = 0;
+    n.children.forEach((c, i) => { t += f(c) + (i ? SIB_GAP : 0); });
+    const v = Math.max(ownHeight(n), t); H.set(n.id, v); return v;
+  })(root);
+  (function f(n, d) {
+    const w = d === 0 ? Math.max(estimateNodeWidth(n.label, n.image), estimateNodeWidth(title, n.image)) : estimateNodeWidth(n.label, n.image);
+    W.set(n.id, w); if (!colW[d] || w > colW[d]) colW[d] = w;
+    n.children.forEach(c => f(c, d + 1));
+  })(root, 0);
+  const colX = []; let x = PAD;
+  colW.forEach((w, d) => { colX[d] = x; x += w + COL_GAP; });
+
+  const pos = {}, edges = [];
+  (function place(n, d, top, parent) {
+    const total = H.get(n.id), w = W.get(n.id);
+    pos[n.id] = { x: colX[d] + w / 2, y: top + total / 2, w, h: ownHeight(n), depth: d };
+    if (parent) edges.push([parent.id, n.id]);
+    if (!n.children.length) return;
+    let ct = 0; n.children.forEach((c, i) => { ct += H.get(c.id) + (i ? SIB_GAP : 0); });
+    let cur = top + (total - ct) / 2;
+    n.children.forEach(c => { place(c, d + 1, cur, n); cur += H.get(c.id) + SIB_GAP; });
+  })(root, 0, PAD, null);
+
+  let minX = 1e9, maxX = -1e9, minY = 1e9, maxY = -1e9;
+  for (const id in pos) {
+    const p = pos[id];
+    minX = Math.min(minX, p.x - p.w / 2); maxX = Math.max(maxX, p.x + p.w / 2);
+    minY = Math.min(minY, p.y - p.h / 2); maxY = Math.max(maxY, p.y + p.h / 2);
+  }
+  const dx = PAD - minX, dy = PAD - minY;
+  for (const id in pos) { pos[id].x += dx; pos[id].y += dy; }
+  return { pos, edges, rootId: root.id, width: maxX - minX + PAD * 2, height: maxY - minY + PAD * 2 };
+}
+
+/* =========================================================================
+ * 7. 다이어그램 뷰 (줌/패닝/미니맵/위치 보간 애니메이션)
+ * ========================================================================= */
+class DiagramView {
+  constructor(o) {
+    this.wrap = $(o.wrap); this.stage = $(o.stage); this.inner = $(o.inner); this.svg = $(o.svg);
+    this.zoomBar = $(o.zoom); this.mm = $(o.mm); this.mmSvg = $(o.mmSvg);
+    this.stateOf = () => 'done'; this.onTarget = null;
+    this.zoom = 1; this.off = { x: 0, y: 0 };
+    this.layout = { pos: {}, edges: [], width: 0, height: 0, rootId: null };
+    this.nodes = new Map(); this.paths = new Map(); this.parentOf = {}; this.cur = {};
+    this.anim = null; this.scrollAnim = null; this.vp = null;
+    this.pointers = new Map(); this.panning = false;
+    this.bind();
+  }
+  clear() {
+    cancelAnimationFrame(this.anim); cancelAnimationFrame(this.scrollAnim);
+    this.nodes.forEach(el => el.remove()); this.nodes.clear();
+    this.paths.forEach(p => p.remove()); this.paths.clear();
+    this.layout = { pos: {}, edges: [], width: 0, height: 0, rootId: null };
+    this.cur = {}; this.parentOf = {}; this.zoom = 1; this.vp = null;
+    this.mmSvg.innerHTML = ''; this.wrap.scrollLeft = 0; this.wrap.scrollTop = 0;
+    this.stage.style.width = '0px'; this.stage.style.height = '0px';
+    this.updateZoomLabel();
+  }
+  /* layout 으로 DOM 을 맞춘다. fill(el,id,isNew)은 노드 내용을 채우는 콜백. */
+  sync(layout, fill, animate) {
+    const prev = this.cur;
+    this.layout = layout;
+    this.parentOf = {}; layout.edges.forEach(([p, c]) => { this.parentOf[c] = p; });
+    for (const [id, el] of this.nodes) if (!layout.pos[id]) { el.remove(); this.nodes.delete(id); }
+    for (const [id, p] of this.paths) if (!this.parentOf[id]) { p.remove(); this.paths.delete(id); }
+    this.svg.setAttribute('width', layout.width); this.svg.setAttribute('height', layout.height);
+
+    const from = {}, created = [];
+    for (const id in layout.pos) {
+      const t = layout.pos[id];
+      let el = this.nodes.get(id), isNew = false;
+      if (!el) { isNew = true; el = document.createElement('div'); el.className = 'node'; this.inner.appendChild(el); this.nodes.set(id, el); }
+      el.style.width = t.w + 'px';
+      fill(el, id, isNew);
+      if (isNew && animate) created.push(el);
+      const pid = this.parentOf[id];
+      const pf = prev[id] || (pid && (prev[pid] || layout.pos[pid])) || t;
+      from[id] = { x: pf.x, y: pf.y, w: t.w, h: t.h };
+    }
+    for (const c of Object.keys(this.parentOf)) {
+      if (!this.paths.has(c)) { const p = document.createElementNS(NS, 'path'); this.svg.appendChild(p); this.paths.set(c, p); }
+    }
+    created.forEach(el => el.classList.add('enter'));
+
+    cancelAnimationFrame(this.anim); this.anim = null;
+    if (!animate || window.matchMedia('(prefers-reduced-motion:reduce)').matches) {
+      this.frame(layout.pos);
+    } else {
+      this.frame(from);
+      const t0 = performance.now(), D = 380;
+      const step = now => {
+        const k = clamp((now - t0) / D, 0, 1), e = 1 - Math.pow(1 - k, 3);
+        if (k >= 1) { this.anim = null; this.frame(layout.pos); return; }
+        const fr = {};
+        for (const id in layout.pos) {
+          const a = from[id], b = layout.pos[id];
+          fr[id] = { x: a.x + (b.x - a.x) * e, y: a.y + (b.y - a.y) * e, w: b.w, h: b.h };
+        }
+        this.frame(fr);
+        this.anim = requestAnimationFrame(step);
+      };
+      this.anim = requestAnimationFrame(step);
+    }
+    this.applySize();
+    this.renderMinimap();
+  }
+  frame(fr) {
+    this.cur = fr;
+    for (const [id, el] of this.nodes) { const p = fr[id]; if (p) { el.style.left = p.x + 'px'; el.style.top = p.y + 'px'; } }
+    for (const [id, path] of this.paths) {
+      const a = fr[this.parentOf[id]], b = fr[id]; if (!a || !b) continue;
+      const x1 = a.x + a.w / 2, y1 = a.y, x2 = b.x - b.w / 2, y2 = b.y, dx = Math.max(16, (x2 - x1) * .5);
+      path.setAttribute('d', `M${x1} ${y1}C${x1 + dx} ${y1} ${x2 - dx} ${y2} ${x2} ${y2}`);
+    }
+  }
+  setAsking(id) { for (const [k, el] of this.nodes) el.classList.toggle('asking', k === id); }
+  applySize() {
+    const L = this.layout; if (!L.width) return;
+    const W = L.width * this.zoom, H = L.height * this.zoom;
+    const cw = this.wrap.clientWidth, ch = this.wrap.clientHeight;
+    this.off.x = Math.max(0, (cw - W) / 2); this.off.y = Math.max(0, (ch - H) / 2);
+    this.stage.style.width = Math.max(W, cw) + 'px';
+    this.stage.style.height = Math.max(H, ch) + 'px';
+    this.inner.style.width = L.width + 'px'; this.inner.style.height = L.height + 'px';
+    this.inner.style.left = this.off.x + 'px'; this.inner.style.top = this.off.y + 'px';
+    this.inner.style.transform = `scale(${this.zoom})`;
+    this.updateViewport();
+  }
+  updateZoomLabel() {
+    const l = this.zoomBar && this.zoomBar.querySelector('.label');
+    if (l) l.textContent = Math.round(this.zoom * 100) + '%';
+  }
+  setZoom(z, mx = null, my = null) {
+    z = clamp(Math.round(z * 100) / 100, 0.3, 2.5);
+    const cw = this.wrap.clientWidth, ch = this.wrap.clientHeight;
+    const vx = mx !== null ? mx : cw / 2, vy = my !== null ? my : ch / 2;
+    const dx = (this.wrap.scrollLeft + vx - this.off.x) / this.zoom, dy = (this.wrap.scrollTop + vy - this.off.y) / this.zoom;
+    this.zoom = z; this.applySize();
+    this.wrap.scrollLeft = dx * z + this.off.x - vx; this.wrap.scrollTop = dy * z + this.off.y - vy;
+    this.updateZoomLabel(); this.updateViewport();
+  }
+  zoomBy(d, mx, my) { this.setZoom(this.zoom + d, mx, my); }
+  fit() {
+    const L = this.layout; if (!L.width) return;
+    const z = clamp(Math.min(1, (this.wrap.clientWidth - 64) / L.width, (this.wrap.clientHeight - 64) / L.height), 0.3, 1);
+    this.setZoom(z); this.wrap.scrollLeft = 0; this.wrap.scrollTop = 0; this.updateViewport();
+  }
+  centerOnNode(id, smooth = true) {
+    const p = this.layout.pos[id]; if (!p) return;
+    const tl = p.x * this.zoom + this.off.x - this.wrap.clientWidth / 2;
+    const tt = p.y * this.zoom + this.off.y - this.wrap.clientHeight / 2;
+    if (smooth) this.animateScrollTo(tl, tt);
+    else { this.wrap.scrollLeft = Math.max(0, tl); this.wrap.scrollTop = Math.max(0, tt); this.updateViewport(); }
+  }
+  animateScrollTo(tl, tt) {
+    const w = this.wrap; cancelAnimationFrame(this.scrollAnim);
+    const sl = w.scrollLeft, st = w.scrollTop;
+    const el = clamp(tl, 0, Math.max(0, w.scrollWidth - w.clientWidth)), et = clamp(tt, 0, Math.max(0, w.scrollHeight - w.clientHeight));
+    const dist = Math.hypot(el - sl, et - st);
+    if (dist < 1) { this.updateViewport(); return; }
+    const dur = clamp(dist * .55, 240, 650), t0 = performance.now();
+    const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    const step = now => {
+      const p = clamp((now - t0) / dur, 0, 1), e = ease(p);
+      w.scrollLeft = sl + (el - sl) * e; w.scrollTop = st + (et - st) * e;
+      this.updateViewport();
+      if (p < 1) this.scrollAnim = requestAnimationFrame(step);
+    };
+    this.scrollAnim = requestAnimationFrame(step);
+  }
+  toggleFullscreen() {
+    const c = this.wrap.closest('.dia'); if (!c) return;
+    if (document.fullscreenElement || document.webkitFullscreenElement) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    else (c.requestFullscreen || c.webkitRequestFullscreen).call(c);
+  }
+  renderMinimap() {
+    const L = this.layout, svg = this.mmSvg;
+    if (!L.width || this.mm.classList.contains('collapsed')) { if (!L.width) svg.innerHTML = ''; return; }
+    svg.setAttribute('viewBox', `0 0 ${L.width} ${L.height}`);
+    let s = '';
+    for (const [p, c] of L.edges) {
+      const a = L.pos[p], b = L.pos[c];
+      const x1 = a.x + a.w / 2, y1 = a.y, x2 = b.x - b.w / 2, y2 = b.y, dx = Math.max(16, (x2 - x1) * .5);
+      s += `<path class="mm-e" d="M${x1} ${y1}C${x1 + dx} ${y1} ${x2 - dx} ${y2} ${x2} ${y2}"/>`;
+    }
+    for (const id in L.pos) {
+      const p = L.pos[id], st = id === L.rootId ? 'root' : this.stateOf(id);
+      s += `<rect class="mm-n ${st}" x="${p.x - p.w / 2}" y="${p.y - p.h / 2}" width="${p.w}" height="${p.h}" rx="5"/>`;
+    }
+    s += '<rect class="mm-vp"/>';
+    svg.innerHTML = s;
+    this.vp = svg.lastChild;
+    this.updateViewport();
+  }
+  updateViewport() {
+    const L = this.layout;
+    if (!this.vp || !L.width) return;
+    const z = this.zoom;
+    const vx = clamp((this.wrap.scrollLeft - this.off.x) / z, 0, L.width), vy = clamp((this.wrap.scrollTop - this.off.y) / z, 0, L.height);
+    const vw = Math.min(L.width - vx, this.wrap.clientWidth / z), vh = Math.min(L.height - vy, this.wrap.clientHeight / z);
+    this.vp.setAttribute('x', vx); this.vp.setAttribute('y', vy);
+    this.vp.setAttribute('width', Math.max(10, vw)); this.vp.setAttribute('height', Math.max(10, vh));
+  }
+  bind() {
+    const wrap = this.wrap;
+    if (this.zoomBar) this.zoomBar.querySelectorAll('.zb').forEach(b => b.addEventListener('click', e => {
+      e.stopPropagation();
+      const a = b.dataset.act;
+      if (a === 'in') this.zoomBy(.15); else if (a === 'out') this.zoomBy(-.15);
+      else if (a === 'reset') this.setZoom(1); else if (a === 'fit') this.fit();
+      else if (a === 'target') this.onTarget && this.onTarget();
+      else if (a === 'fullscreen') this.toggleFullscreen();
+    }));
+
+    // 포인터 기반 패닝 + 두 손가락 핀치줌
+    const pts = () => Array.from(this.pointers.values());
+    const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+    wrap.addEventListener('pointerdown', e => {
+      if (e.target.closest('input,button,.clickable,.thumb')) return;
+      try { wrap.setPointerCapture(e.pointerId); } catch (_) {}
+      this.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (this.pointers.size === 1) {
+        this.panning = true; this.px = e.clientX; this.py = e.clientY; this.sx = wrap.scrollLeft; this.sy = wrap.scrollTop;
+      } else if (this.pointers.size === 2) {
+        this.panning = false; const [a, b] = pts(); this.pd = Math.max(1, dist(a, b)); this.pz = this.zoom;
+      }
+    });
+    wrap.addEventListener('pointermove', e => {
+      if (!this.pointers.has(e.pointerId)) return;
+      this.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (this.pointers.size >= 2) {
+        const [a, b] = pts(), r = wrap.getBoundingClientRect();
+        this.setZoom(this.pz * (Math.max(1, dist(a, b)) / this.pd), (a.x + b.x) / 2 - r.left, (a.y + b.y) / 2 - r.top);
+      } else if (this.panning) {
+        wrap.scrollLeft = this.sx - (e.clientX - this.px); wrap.scrollTop = this.sy - (e.clientY - this.py);
+        this.updateViewport();
+      }
+    });
+    const end = e => {
+      if (!this.pointers.has(e.pointerId)) return;
+      this.pointers.delete(e.pointerId);
+      try { wrap.releasePointerCapture(e.pointerId); } catch (_) {}
+      if (this.pointers.size === 1) {
+        const [p] = pts(); this.panning = true; this.px = p.x; this.py = p.y; this.sx = wrap.scrollLeft; this.sy = wrap.scrollTop;
+      } else if (this.pointers.size === 0) this.panning = false;
+    };
+    wrap.addEventListener('pointerup', end); wrap.addEventListener('pointercancel', end);
+    wrap.addEventListener('wheel', e => {
+      if (e.ctrlKey || e.metaKey || e.altKey) {
+        e.preventDefault();
+        const r = wrap.getBoundingClientRect();
+        this.zoomBy(clamp(-e.deltaY * .006, -.06, .06), e.clientX - r.left, e.clientY - r.top);
+      }
+    }, { passive: false });
+    wrap.addEventListener('scroll', () => this.updateViewport(), { passive: true });
+    new ResizeObserver(() => this.applySize()).observe(wrap);
+
+    // 미니맵
+    const head = this.mm.querySelector('.mm-head');
+    head.addEventListener('click', () => {
+      this.mm.classList.toggle('collapsed');
+      head.querySelector('use').setAttribute('href', this.mm.classList.contains('collapsed') ? '#i-up' : '#i-down');
+      this.renderMinimap();
+    });
+    let drag = false;
+    const nav = e => {
+      const pt = this.mmSvg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+      const m = this.mmSvg.getScreenCTM(); if (!m) return;
+      const p = pt.matrixTransform(m.inverse());
+      wrap.scrollLeft = Math.max(0, p.x * this.zoom + this.off.x - wrap.clientWidth / 2);
+      wrap.scrollTop = Math.max(0, p.y * this.zoom + this.off.y - wrap.clientHeight / 2);
+      this.updateViewport();
+    };
+    this.mmSvg.addEventListener('pointerdown', e => { drag = true; try { this.mmSvg.setPointerCapture(e.pointerId); } catch (_) {} nav(e); });
+    this.mmSvg.addEventListener('pointermove', e => { if (drag) nav(e); });
+    this.mmSvg.addEventListener('pointerup', () => { drag = false; });
+    this.mmSvg.addEventListener('pointercancel', () => { drag = false; });
+  }
+}
+const hubView = new DiagramView({ wrap: 'trHubWrap', stage: 'trHubStage', inner: 'trHubInner', svg: 'trHubSvg', zoom: 'trHubZoom', mm: 'trHubMm', mmSvg: 'trHubMmSvg' });
+const studyView = new DiagramView({ wrap: 'trStudyWrap', stage: 'trStudyStage', inner: 'trStudyInner', svg: 'trStudySvg', zoom: 'trStudyZoom', mm: 'trStudyMm', mmSvg: 'trStudyMmSvg' });
+
+/* =========================================================================
+ * 8. 화면 전환 / 목록 / 폴더 / 드래그 정렬
+ * ========================================================================= */
+const screens = [$('screen-tree-list'), $('screen-tree-edit'), $('screen-tree-study')];
+function showScreen(el) { screens.forEach(s => s.classList.add('hidden')); el.classList.remove('hidden'); }
+const screenList = screens[0], screenEdit = screens[1], screenStudy = screens[2];
+
+let currentFolderId = null, dragData = null;
+function getRootItems() {
+  const f = Object.values(TREE_FOLDERS).map(x => ({ type: 'folder', id: x.id, order: x.order || 0, obj: x }));
+  const t = Object.values(TREES).filter(x => !x.folderId).map(x => ({ type: 'tree', id: x.id, order: x.order || 0, obj: x }));
+  return [...f, ...t].sort((a, b) => a.order - b.order);
+}
+const getFolderItems = fid => Object.values(TREES).filter(t => t.folderId === fid)
+  .map(t => ({ type: 'tree', id: t.id, order: t.order || 0, obj: t })).sort((a, b) => a.order - b.order);
+const currentScopeItems = () => currentFolderId ? getFolderItems(currentFolderId) : getRootItems();
+async function persistDrag() { await saveTrees(); await saveTreeFolders(); }
+
+async function reorderTo(targetId) {
+  const scope = currentScopeItems();
+  const from = scope.findIndex(it => it.id === dragData.id); if (from === -1) return;
+  const [moved] = scope.splice(from, 1);
+  const to = scope.findIndex(it => it.id === targetId);
+  scope.splice(to === -1 ? scope.length : to, 0, moved);
+  scope.forEach((it, i) => { it.obj.order = (i + 1) * 10; });
+  await persistDrag(); renderTreeList();
+}
+async function moveTreeIntoFolder(treeId, folderId) {
+  const t = TREES[treeId]; if (!t || t.folderId === folderId) return;
+  t.folderId = folderId; t.order = (getFolderItems(folderId).length + 1) * 10;
+  await saveTrees(); renderTreeList();
+}
+async function removeTreeFromFolder(treeId) {
+  const t = TREES[treeId]; if (!t) return;
+  t.folderId = null; t.order = (getRootItems().length + 1) * 10;
+  await saveTrees(); renderTreeList();
+}
+function makeDraggable(el, type, id, isFolderTarget) {
+  el.draggable = true;
+  el.addEventListener('dragstart', e => {
+    dragData = { type, id }; e.dataTransfer.effectAllowed = 'move';
+    setTimeout(() => el.classList.add('dragging'), 0);
+  });
+  el.addEventListener('dragend', () => {
+    el.classList.remove('dragging');
+    document.querySelectorAll('.drop-before,.drop-into').forEach(x => x.classList.remove('drop-before', 'drop-into'));
+  });
+  el.addEventListener('dragover', e => {
+    if (!dragData || dragData.id === id) return;
+    e.preventDefault();
+    el.classList.add(isFolderTarget && dragData.type === 'tree' ? 'drop-into' : 'drop-before');
+  });
+  el.addEventListener('dragleave', () => el.classList.remove('drop-before', 'drop-into'));
+  el.addEventListener('drop', async e => {
+    e.preventDefault(); el.classList.remove('drop-before', 'drop-into');
+    if (!dragData || dragData.id === id) return;
+    if (isFolderTarget && dragData.type === 'tree') await moveTreeIntoFolder(dragData.id, id);
+    else await reorderTo(id);
+    dragData = null;
+  });
+}
+
+function renderTreeList() {
+  const grid = $('trGrid'), back = $('btnTrFolderBack'), title = $('trListTitle');
+  const folder = currentFolderId && TREE_FOLDERS[currentFolderId];
+  if (currentFolderId && !folder) currentFolderId = null;
+  if (currentFolderId) { back.classList.remove('hidden'); title.textContent = folder.name; }
+  else { back.classList.add('hidden'); title.textContent = '내 구조도'; }
+
+  const items = currentScopeItems();
+  if (!items.length) {
+    grid.innerHTML = `<div class="empty-msg">${currentFolderId ? '비어 있음' : '구조도 없음'}</div>`;
+    return;
+  }
+  const frag = document.createDocumentFragment();
+  items.forEach(it => frag.appendChild(it.type === 'folder' ? buildFolderCard(it.obj) : buildTreeCard(it.obj)));
+  grid.replaceChildren(frag);
+}
+
+function buildFolderCard(folder) {
+  const count = getFolderItems(folder.id).length;
+  const card = document.createElement('div');
+  card.className = 'card folder';
+  card.innerHTML = `
+    <div class="card-title">${icon('folder', 'lg')}<span>${escapeHtml(folder.name)}</span></div>
+    <div class="card-meta"><span>구조도 ${count}개</span></div>
+    <div class="card-actions">
+      <button class="btn btn-sm btn-primary" data-act="open">열기</button>
+      <button class="btn btn-sm" data-act="rename">${icon('edit')}이름 변경</button>
+      <button class="btn btn-sm btn-danger icon-only" data-act="del" title="삭제">${icon('trash')}</button>
+    </div>`;
+  card.querySelector('[data-act="open"]').onclick = () => { currentFolderId = folder.id; renderTreeList(); };
+  card.querySelector('[data-act="rename"]').onclick = async () => {
+    const name = prompt('폴더 이름을 입력하세요', folder.name);
+    if (!name || !name.trim()) return;
+    folder.name = name.trim(); await saveTreeFolders(); renderTreeList();
+  };
+  card.querySelector('[data-act="del"]').onclick = async () => {
+    const items = getFolderItems(folder.id);
+    if (!confirm(`"${folder.name}" 폴더를 삭제할까요?${items.length ? ` (안의 구조도 ${items.length}개는 전체 목록으로 이동됩니다)` : ''}`)) return;
+    const rootN = getRootItems().length;
+    items.forEach((it, i) => { it.obj.folderId = null; it.obj.order = (rootN + i + 1) * 10; });
+    delete TREE_FOLDERS[folder.id];
+    await saveTrees(); await saveTreeFolders(); renderTreeList();
+  };
+  makeDraggable(card, 'folder', folder.id, true);
+  return card;
+}
+
+function buildTreeCard(tree) {
+  const nodeCount = flattenTreeDFS(tree.root).length, wrong = getWrongCount(tree.id);
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <div class="card-title">${escapeHtml(tree.title)}</div>
+    <div class="card-meta"><span>노드 ${nodeCount}개</span>${wrong ? `<span class="meta-wrong">오답 ${wrong}개</span>` : ''}</div>
+    <div class="card-actions">
+      <button class="btn btn-sm btn-primary" data-act="study">${icon('play')}학습</button>
+      <button class="btn btn-sm" data-act="blank">${icon('blank')}백지</button>
+      <button class="btn btn-sm" data-act="edit">${icon('edit')}편집</button>
+      <button class="btn btn-sm icon-only" data-act="export" title="MD로 내보내기">${icon('out')}</button>
+      <button class="btn btn-sm btn-danger icon-only" data-act="del" title="삭제">${icon('trash')}</button>
+    </div>
+    ${currentFolderId ? `<button class="btn btn-sm btn-block" data-act="unfile">${icon('out')}폴더에서 빼기</button>` : ''}`;
+  card.querySelector('[data-act="study"]').onclick = () => openTreeStudy(tree.id, 'hub');
+  card.querySelector('[data-act="blank"]').onclick = () => openTreeStudy(tree.id, 'blank');
+  card.querySelector('[data-act="edit"]').onclick = () => openTreeEditor(tree.id);
+  card.querySelector('[data-act="export"]').onclick = () => exportTreeMd(tree.id);
+  card.querySelector('[data-act="del"]').onclick = async () => {
+    if (!confirm(`"${tree.title}" 구조도를 삭제할까요? (오답 기록도 함께 삭제됩니다)`)) return;
+    delete TREES[tree.id]; delete TREE_WRONG[tree.id];
+    await saveTrees(); await saveTreeWrong(); renderTreeList();
+  };
+  const unfile = card.querySelector('[data-act="unfile"]');
+  if (unfile) unfile.onclick = () => removeTreeFromFolder(tree.id);
+  makeDraggable(card, 'tree', tree.id, false);
+  return card;
+}
+
+const btnBack = $('btnTrFolderBack');
+btnBack.addEventListener('click', () => { currentFolderId = null; renderTreeList(); });
+btnBack.addEventListener('dragover', e => { if (dragData && dragData.type === 'tree') { e.preventDefault(); btnBack.classList.add('drop-into'); } });
+btnBack.addEventListener('dragleave', () => btnBack.classList.remove('drop-into'));
+btnBack.addEventListener('drop', async e => {
+  e.preventDefault(); btnBack.classList.remove('drop-into');
+  if (dragData && dragData.type === 'tree' && currentFolderId) await removeTreeFromFolder(dragData.id);
+  dragData = null;
+});
+$('btnTrNewFolder').addEventListener('click', async () => {
+  const name = prompt('새 폴더 이름을 입력하세요', `새 폴더 ${Object.keys(TREE_FOLDERS).length + 1}`);
+  if (!name || !name.trim()) return;
+  const id = genFolderId();
+  TREE_FOLDERS[id] = { id, name: name.trim(), createdAt: Date.now(), order: (getRootItems().length + 1) * 10 };
+  await saveTreeFolders(); renderTreeList();
+});
+
+/* =========================================================================
+ * 9. 편집 화면
+ * ========================================================================= */
+const treeEdit = { treeId: null, root: null };
+$('btnTrNew').addEventListener('click', () => {
+  const id = genTreeId();
+  TREES[id] = { id, title: '새 구조도', createdAt: Date.now(), outline: '', root: makeTreeNode('루트'),
+    folderId: currentFolderId, order: (currentScopeItems().length + 1) * 10 };
+  openTreeEditor(id);
+});
+function openTreeEditor(treeId) {
+  treeEdit.treeId = treeId;
+  const tree = TREES[treeId]; treeEdit.root = tree.root;
+  $('trTitleInput').value = tree.title; $('trOutlineInput').value = tree.outline || '';
+  renderTreePreview(); showScreen(screenEdit);
+}
+$('btnTrEditBack').addEventListener('click', () => { showScreen(screenList); renderTreeList(); });
+$('btnTrParse').addEventListener('click', () => {
+  const newRoot = parseOutlineToTree($('trOutlineInput').value);
+  mergeTreeAttachments(newRoot, treeEdit.root);
+  treeEdit.root = newRoot; renderTreePreview();
+});
+async function commitEdit() {
+  const tree = TREES[treeEdit.treeId]; if (!tree) return null;
+  tree.title = $('trTitleInput').value.trim() || '이름 없는 구조도';
+  tree.outline = $('trOutlineInput').value;
+  const newRoot = parseOutlineToTree(tree.outline);
+  mergeTreeAttachments(newRoot, treeEdit.root);
+  tree.root = newRoot; treeEdit.root = newRoot;
+  if (pruneStaleWrongEntries(tree)) await saveTreeWrong();
+  await saveTrees();
+  return tree;
+}
+$('btnTrSave').addEventListener('click', async () => { if (await commitEdit()) { showScreen(screenList); renderTreeList(); } });
+$('btnTrEditStudy').addEventListener('click', async () => { const t = await commitEdit(); if (t) openTreeStudy(t.id, 'hub'); });
+
+function renderTreePreview() {
+  const wrap = $('trPreview'), root = treeEdit.root;
+  if (!root || !root.children.length) {
+    wrap.innerHTML = ''; return;
+  }
+  const frag = document.createDocumentFragment();
+  (function walk(node, depth) {
+    node.children.forEach(child => {
+      const hasBlank = !!child.blankMask, hasImg = !!child.image;
+      const row = document.createElement('div');
+      row.className = 'pv-row'; row.style.paddingLeft = (depth * 16 + 6) + 'px';
+      row.innerHTML = `
+        <span class="pv-mark ${child.children.length ? 'branch' : ''}"></span>
+        <span class="pv-label">${hasImg ? `<img class="pv-thumb" src="${child.image}">` : ''}<span>${escapeHtml(child.label)}</span></span>
+        <button type="button" class="pill ${hasImg ? 'on' : ''}" data-k="img">${hasImg ? '사진 있음' : '사진 추가'}</button>
+        <button type="button" class="pill ${hasBlank ? 'on' : ''}" data-k="blank">${hasBlank ? '부분 빈칸' : '빈칸 설정'}</button>`;
+      const blankHolder = document.createElement('div'), imgHolder = document.createElement('div');
+      row.querySelector('[data-k="blank"]').onclick = () => {
+        imgHolder.innerHTML = '';
+        if (blankHolder.childElementCount) { blankHolder.innerHTML = ''; return; }
+        blankHolder.appendChild(buildBlankConfigPanel(child, renderTreePreview));
+      };
+      row.querySelector('[data-k="img"]').onclick = () => {
+        blankHolder.innerHTML = '';
+        if (imgHolder.childElementCount) { imgHolder.innerHTML = ''; return; }
+        imgHolder.appendChild(buildImageConfigPanel(child, renderTreePreview));
+      };
+      frag.append(row, imgHolder, blankHolder);
+      walk(child, depth + 1);
+    });
+  })(root, 0);
+  wrap.replaceChildren(frag);
+}
+
+function buildBlankConfigPanel(node, onChange) {
+  const panel = document.createElement('div'); panel.className = 'cfg';
+  let mask = getBlankMask(node).split('');
+  const box = document.createElement('div'); box.className = 'cfg-text';
+  const prev = document.createElement('div'); prev.className = 'cfg-preview';
+  panel.append(box, prev);
+  function draw() {
+    box.innerHTML = '';
+    node.label.split('').forEach((ch, i) => {
+      const sp = document.createElement('span'), isSpace = /\s/.test(ch);
+      sp.className = 'cfg-char' + (isSpace ? ' space' : '') + (mask[i] === '1' ? ' blank' : '');
+      sp.textContent = ch;
+      if (!isSpace) sp.onclick = () => { mask[i] = mask[i] === '1' ? '0' : '1'; draw(); };
+      box.appendChild(sp);
+    });
+    prev.textContent = '미리보기: ' + buildBlankSegments(node.label, mask.join('')).map(s => s.blank ? '_'.repeat(Math.max(1, s.text.length)) : s.text).join('');
+  }
+  draw();
+  const mk = (t, cls, fn) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'btn btn-sm ' + cls; b.textContent = t; b.onclick = fn; return b; };
+  const quick = document.createElement('div'); quick.className = 'cfg-row';
+  quick.append(mk('전체 빈칸(기본)', '', () => { mask = defaultBlankMask(node.label).split(''); draw(); }),
+               mk('전체 공개', '', () => { mask = node.label.split('').map(() => '0'); draw(); }));
+  const act = document.createElement('div'); act.className = 'cfg-row';
+  act.append(mk('저장', 'btn-primary', () => {
+    const fm = mask.join('');
+    node.blankMask = fm === defaultBlankMask(node.label) ? null : fm; node.bracket = false; onChange();
+  }), mk('닫기', '', () => panel.remove()));
+  panel.append(quick, act);
+  return panel;
+}
+
+function resizeImageFile(file, maxDim = 640, quality = 0.8) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = reject;
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          const r = Math.min(maxDim / width, maxDim / height);
+          width = Math.round(width * r); height = Math.round(height * r);
+        }
+        const cv = document.createElement('canvas'); cv.width = width; cv.height = height;
+        cv.getContext('2d').drawImage(img, 0, 0, width, height);
+        resolve(cv.toDataURL('image/jpeg', quality));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+function buildImageConfigPanel(node, onChange) {
+  const panel = document.createElement('div'); panel.className = 'cfg';
+  const pv = document.createElement('div'); pv.className = 'cfg-img'; panel.appendChild(pv);
+  function draw() {
+    pv.innerHTML = '';
+    if (node.image) { const i = document.createElement('img'); i.src = node.image; pv.appendChild(i); }
+    else { const d = document.createElement('div'); d.className = 'cfg-empty'; d.textContent = '사진 없음'; pv.appendChild(d); }
+  }
+  draw();
+  const fi = document.createElement('input'); fi.type = 'file'; fi.accept = 'image/*'; fi.style.display = 'none'; panel.appendChild(fi);
+  fi.onchange = async () => {
+    const f = fi.files && fi.files[0]; if (!f) return;
+    try { node.image = await resizeImageFile(f); draw(); onChange(); }
+    catch (e) { toast('사진을 불러오지 못했습니다'); }
+    finally { fi.value = ''; }
+  };
+  const mk = (t, fn) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'btn btn-sm'; b.textContent = t; b.onclick = fn; return b; };
+  const row = document.createElement('div'); row.className = 'cfg-row';
+  row.append(mk(node.image ? '사진 바꾸기' : '사진 선택', () => fi.click()),
+             mk('사진 삭제', () => { if (!node.image) return; node.image = null; draw(); onChange(); }),
+             mk('닫기', () => panel.remove()));
+  panel.appendChild(row);
+  return panel;
+}
+
+/* 노드 박스 공통 조각 */
+function addText(el, text) {
+  const d = document.createElement('div'); d.className = 'txt'; d.textContent = text; el.appendChild(d);
+}
+function attachImage(el, node) {
+  if (!node.image) return;
+  const img = document.createElement('img');
+  img.className = 'thumb'; img.decoding = 'async'; img.src = node.image; img.alt = node.label;
+  if (el.classList.contains('active')) img.style.flex = '0 0 100%';
+  img.addEventListener('click', e => { e.stopPropagation(); $('trImgLightboxImg').src = node.image; $('trImgLightbox').classList.remove('hidden'); });
+  el.insertBefore(img, el.firstChild);
+}
+function addChildDot(el, n) {
+  const d = document.createElement('div'); d.className = 'dot-child';
+  d.textContent = n > 99 ? '99+' : String(n); d.title = `바로 아래 하위 노드 ${n}개`; el.appendChild(d);
+}
+$('trImgLightbox').addEventListener('click', () => $('trImgLightbox').classList.add('hidden'));
+
+/* =========================================================================
+ * 10. 학습 공통 상태
+ * ========================================================================= */
+const S = {
+  tree: null, byId: new Map(), parentOf: new Map(), layout: null,
+  mode: 'hub', token: 0,
+  list: [], index: 0, target: new Set(), answered: new Set(), cur: [], curIds: new Set(),
+  canAdvance: false, mistake: false, wrongReview: false, focusEl: null,
+  // 백지 모드
+  units: [], revealed: new Set(), missed: new Set(), curParent: null, locked: false, stats: { ok: 0, miss: 0 },
+};
+
+function openTreeStudy(treeId, mode) {
+  S.tree = TREES[treeId];
+  S.byId = new Map(); S.parentOf = new Map();
+  S.byId.set(S.tree.root.id, S.tree.root);
+  (function walk(n) { n.children.forEach(c => { S.byId.set(c.id, c); S.parentOf.set(c.id, n); walk(c); }); })(S.tree.root);
+  S.layout = computeLayout(S.tree.root, S.tree.title);
+  hubView.clear(); studyView.clear();
+  showScreen(screenStudy);
+  if (mode === 'blank') beginBlankSession(); else showHub();
+}
+$('btnTrStudyBack').addEventListener('click', () => { S.token++; showScreen(screenList); renderTreeList(); });
+$('btnTrStudyBackFloat').addEventListener('click', () => {
+  S.token++;
+  $('trDoneModal').classList.add('hidden');
+  $('trStudyProgress').classList.add('hidden'); $('trStudyHeader').classList.remove('hidden');
+  showScreen(screenList); renderTreeList();
+});
+$('btnTrBackToHub').addEventListener('click', showHub);
+
+function setFeedback(kind, text) {
+  $('trStudyFeedback').innerHTML = text ? `<span class="fb ${kind}">${escapeHtml(text)}</span>` : '';
+}
+
+/* =========================================================================
+ * 11. 허브(개요)
+ * ========================================================================= */
+function showHub() {
+  S.token++; S.mode = 'hub';
+  $('trDoneModal').classList.add('hidden');
+  $('trStudyHeader').classList.remove('hidden');
+  $('trStudyProgress').classList.add('hidden');
+  $('trHub').classList.remove('hidden');
+  $('trStudyTitle').textContent = S.tree.title;
+
+  const wrongMap = getWrongMap(S.tree.id);
+  hubView.stateOf = () => 'done';
+  hubView.sync(S.layout, (el, id) => {
+    const node = S.byId.get(id), isRoot = id === S.tree.root.id;
+    el.className = 'node ' + (isRoot ? 'root' : 'done');
+    el.replaceChildren(); el.onclick = null; el.removeAttribute('title');
+    addText(el, isRoot ? S.tree.title : node.label);
+    attachImage(el, node);
+    if (node.children.length) {
+      addChildDot(el, node.children.length);
+      if (!isRoot) {
+        el.classList.add('clickable');
+        el.title = `"${node.label}" 아래만 다시 학습하기`;
+        el.onclick = () => startFocusedStudy(node);
+      }
+    }
+    if (wrongMap[id]) {
+      const d = document.createElement('div'); d.className = 'dot-wrong';
+      d.textContent = wrongMap[id].miss > 9 ? '9+' : String(wrongMap[id].miss);
+      d.title = `이 노드에서 ${wrongMap[id].miss}번 틀렸습니다`; el.appendChild(d);
+    }
+  }, false);
+  hubView.fit();
+
+  const wrongCount = getWrongCount(S.tree.id);
+  $('trHubSummary').textContent = `노드 ${flattenTreeDFS(S.tree.root).length}개 · 오답 ${wrongCount}개`;
+  $('trWrongLabel').textContent = `오답만 재학습 (${wrongCount})`;
+  $('btnTrStudyWrong').disabled = wrongCount === 0;
+}
+
+/* =========================================================================
+ * 12. 일반 학습 (빈칸 입력 방식)
+ * ========================================================================= */
+function groupIntoUnits(nodes) {
+  const units = []; let i = 0;
+  while (i < nodes.length) {
+    const p = S.parentOf.get(nodes[i].id), pid = p ? p.id : null;
+    const unit = [nodes[i]]; let j = i + 1;
+    while (j < nodes.length) {
+      const p2 = S.parentOf.get(nodes[j].id);
+      if ((p2 ? p2.id : null) === pid) { unit.push(nodes[j]); j++; } else break;
+    }
+    units.push(unit); i = j;
+  }
+  return units;
+}
+function beginStudySession(nodes, wrongReview) {
+  if (!nodes.length) return;
+  S.token++; S.mode = 'study';
+  S.list = groupIntoUnits(nodes); S.target = new Set(nodes.map(n => n.id));
+  S.answered = new Set(); S.index = 0; S.wrongReview = !!wrongReview;
+  $('trStudyHeader').classList.add('hidden'); $('trHub').classList.add('hidden');
+  const prog = $('trStudyProgress'); prog.classList.remove('hidden', 'mode-blank');
+  studyView.clear();
+  studyView.onTarget = () => studyView.centerOnNode(S.cur[0] && S.cur[0].id);
+  renderStudyStep();
+}
+function startFocusedStudy(node) {
+  const flat = flattenTreeBFS(node); if (!flat.length) return;
+  beginStudySession(flat.map(x => x.node), false);
+}
+$('btnTrStudyAll').addEventListener('click', () => beginStudySession(flattenTreeBFS(S.tree.root).map(x => x.node), false));
+$('btnTrStudyWrong').addEventListener('click', () => beginStudySession(getWrongNodeList(S.tree).map(x => x.node), true));
+$('btnTrStudyBlank').addEventListener('click', beginBlankSession);
+
+function nodeState(n) {
+  if (S.curIds.has(n.id) && !S.answered.has(n.id)) return 'active';
+  if (S.answered.has(n.id)) return 'done';
+  if (S.target.has(n.id)) return 'pending';
+  return 'context';
+}
+function renderStudyStep() {
+  const unit = S.list[S.index];
+  S.cur = unit; S.curIds = new Set(unit.map(n => n.id));
+  $('trStudyBar').style.width = `${((S.index + 1) / S.list.length) * 100}%`;
+  setFeedback('', '');
+  S.canAdvance = false; S.mistake = false;
+  drawStudy();
+  studyView.centerOnNode(unit[0].id, true);
+}
+function finalizeNodeOutcome(node) {
+  if (S.mistake) markNodeMistake(S.tree.id, node.id); else markNodeMastered(S.tree.id, node.id);
+}
+function drawStudy() {
+  S.focusEl = null;
+  studyView.stateOf = id => nodeState(S.byId.get(id));
+  studyView.sync(S.layout, fillStudy, false);
+  let f = S.focusEl;
+  if (S.cur.length > 1) {
+    f = null;   // 그룹은 항상 '아직 못 맞힌 첫 번째 노드'에 포커스
+    for (const n of S.cur) {
+      if (S.answered.has(n.id)) continue;
+      const el = studyView.nodes.get(n.id), inp = el && el.querySelector('input.in-group, input.in-blank:not(:disabled)');
+      if (inp) { f = inp; break; }
+    }
+  } else if (!f && S.cur.length > 1) {
+    for (const n of S.cur) {
+      if (S.answered.has(n.id)) continue;
+      const el = studyView.nodes.get(n.id), inp = el && el.querySelector('input.in-group, input.in-blank:not(:disabled)');
+      if (inp) { f = inp; break; }
+    }
+  }
+  if (f) setTimeout(() => f.focus(), 0);
+}
+function fillStudy(el, id) {
+  const node = S.byId.get(id), isRoot = id === S.tree.root.id;
+  const st = isRoot ? 'root' : nodeState(node);
+  if (el.dataset.state === st) return;
+  el.dataset.state = st; el.replaceChildren(); el.removeAttribute('title');
+  if (isRoot) {
+    el.className = 'node root'; addText(el, S.tree.title); attachImage(el, node);
+  } else if (st === 'active') {
+    el.className = 'node active';
+    if (S.cur.length > 1 && !S.wrongReview && hasPartialBlank(node)) renderCloze(el, node);
+    else if (S.cur.length > 1) { const gi = renderGroupInput(el, node); if (!S.focusEl) S.focusEl = gi; }
+    else if (S.wrongReview) S.focusEl = renderFullInput(el, node);
+    else renderCloze(el, node);
+    attachImage(el, node);
+  } else if (st === 'done') {
+    el.className = 'node done'; addText(el, node.label); attachImage(el, node); el.title = node.label;
+  } else if (st === 'pending') {
+    el.className = 'node pending'; addText(el, '?');
+  } else {
+    el.className = 'node context'; addText(el, node.label); attachImage(el, node); el.title = node.label;
+  }
+  if (node.children.length) addChildDot(el, node.children.length);
+}
+
+/* 정답을 모두 맞히면 잠깐 정답 표시 후 자동으로 다음 단계로. (그 사이 Enter 를 눌러도 즉시 넘어감) */
+let autoTimer = null;
+function readyToAdvance() {
+  S.canAdvance = true;
+  clearTimeout(autoTimer);
+  const tk = S.token, idx = S.index;
+  autoTimer = setTimeout(() => {
+    autoTimer = null;
+    if (S.token === tk && S.index === idx && S.mode === 'study' && S.canAdvance) goToNextStudyStep();
+  }, 350);
+}
+function hasPartialBlank(node) {
+  if (!node.blankMask) return false;
+  const segs = buildBlankSegments(node.label, getBlankMask(node));
+  return segs.some(g => g.blank) && segs.some(g => !g.blank && g.text.trim());
+}
+function completeClozeNode(node) {
+  S.answered.add(node.id); finalizeNodeOutcome(node);
+  if (S.cur.length > 1) {
+    const left = S.cur.filter(n => !S.answered.has(n.id));
+    if (!left.length) { setFeedback('ok', '정답입니다'); readyToAdvance(); }
+    else { setFeedback('ok', `"${node.label}" 정답 (${left.length}개 남음)`); studyView.centerOnNode(left[0].id, true); }
+    drawStudy();
+  } else { setFeedback('ok', '정답입니다'); readyToAdvance(); }
+}
+function renderCloze(box, node) {
+  const segs = buildBlankSegments(node.label, getBlankMask(node));
+  const blanks = [];
+  segs.forEach(seg => {
+    if (seg.blank) {
+      const inp = document.createElement('input');
+      inp.type = 'text'; inp.className = 'in-blank'; inp.autocomplete = 'off'; inp.dataset.answer = seg.text;
+      inp.style.width = Math.max(2, seg.text.length) + 1.2 + 'ch';
+      inp.addEventListener('input', () => { inp.style.width = Math.max(seg.text.length, inp.value.length, 2) + 1.2 + 'ch'; });
+      blanks.push(inp); box.appendChild(inp);
+    } else { const sp = document.createElement('span'); sp.textContent = seg.text; box.appendChild(sp); }
+  });
+  if (!blanks.length) {
+    S.answered.add(node.id); finalizeNodeOutcome(node); S.canAdvance = true; return;
+  }
+  blanks.forEach((inp, i) => inp.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' || !inp.value.trim()) return;
+    e.stopPropagation();
+    if (singleMatch(inp.value, inp.dataset.answer)) {
+      inp.classList.remove('wrong'); inp.classList.add('correct'); inp.disabled = true;
+      if (blanks[i + 1]) blanks[i + 1].focus();
+      else completeClozeNode(node);
+    } else {
+      S.mistake = true; inp.classList.add('wrong'); setFeedback('bad', '다시 시도해보세요');
+      setTimeout(() => inp.classList.remove('wrong'), 300);
+    }
+  }));
+  if (S.cur.length <= 1) setTimeout(() => blanks[0].focus(), 0);
+}
+function renderGroupInput(box, node) {
+  const inp = document.createElement('input');
+  inp.type = 'text'; inp.className = 'in-group'; inp.autocomplete = 'off'; inp.placeholder = '?';
+  box.appendChild(inp);
+  inp.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' || !inp.value.trim()) return;
+    e.stopPropagation(); checkGroupAnswer(inp.value); inp.value = '';
+  });
+  return inp;
+}
+function checkGroupAnswer(typed) {
+  const remaining = S.cur.filter(n => !S.answered.has(n.id));
+  const m = remaining.find(n => singleMatch(typed, n.label));
+  if (!m) { S.mistake = true; setFeedback('bad', '다시 시도해보세요'); return; }
+  S.answered.add(m.id);
+  const left = S.cur.filter(n => !S.answered.has(n.id));
+  if (!left.length) {
+    setFeedback('ok', '정답입니다');
+    S.cur.forEach(finalizeNodeOutcome); drawStudy(); readyToAdvance();
+  } else {
+    setFeedback('ok', `"${m.label}" 정답 (${left.length}개 남음)`);
+    studyView.centerOnNode(left[0].id, true); drawStudy();
+  }
+}
+function renderFullInput(box, node) {
+  const inp = document.createElement('input');
+  inp.type = 'text'; inp.className = 'in-group'; inp.autocomplete = 'off'; inp.placeholder = '?';
+  box.appendChild(inp);
+  inp.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' || !inp.value.trim()) return;
+    e.stopPropagation();
+    if (singleMatch(inp.value, node.label)) {
+      S.answered.add(node.id); setFeedback('ok', '정답입니다');
+      finalizeNodeOutcome(node); drawStudy(); readyToAdvance();
+    } else {
+      S.mistake = true; inp.classList.add('wrong'); setFeedback('bad', '다시 시도해보세요');
+      setTimeout(() => inp.classList.remove('wrong'), 300);
+    }
+  });
+  return inp;
+}
+function skipCurrentUnit() {
+  S.cur.forEach(n => { S.answered.add(n.id); markNodeMistake(S.tree.id, n.id); });
+  setFeedback('warn', '정답: ' + S.cur.map(n => n.label).join(', '));
+  drawStudy(); S.canAdvance = true;
+}
+function goToNextStudyStep() {
+  clearTimeout(autoTimer); autoTimer = null;
+  if (S.index < S.list.length - 1) { S.index++; renderStudyStep(); }
+  else { toast('모든 노드를 학습했습니다'); showHub(); }
+}
+
+/* =========================================================================
+ * 13. 백지 학습
+ *  - 처음에는 루트(선택한 구조도의 이름)만 있고, 맞힌 노드만 엣지로 이어 붙는다.
+ *  - 레이아웃은 "맞힌 노드만"으로 매번 새로 계산하므로 간격/빈 자리로 구조가 새지 않는다.
+ *  - 다음 노드, 개수, 진행률, 하위 노드 점 표시는 전혀 노출하지 않는다.
+ *  - 틀리면 같은 자리에 남고, 맞으면 자동으로 다음 질문으로 넘어간다.
+ *  - 같은 부모의 자식들은 한 묶음이며 순서와 상관없이 입력할 수 있다.
+ * ========================================================================= */
+function buildBlankUnits(root) {
+  const units = [];
+  (function walk(n) {
+    if (!n.children.length) return;
+    units.push({ parent: n, nodes: n.children.slice() });
+    n.children.forEach(walk);
+  })(root);
+  return units;
+}
+function pruneRevealed(n) {
+  return { id: n.id, label: n.label, image: n.image,
+    children: n.children.filter(c => S.revealed.has(c.id)).map(pruneRevealed) };
+}
+function beginBlankSession() {
+  const units = buildBlankUnits(S.tree.root);
+  if (!units.length) { toast('이 구조도에는 노드가 없습니다'); return; }
+  S.token++; S.mode = 'blank';
+  S.units = units; S.index = 0;
+  S.revealed = new Set([S.tree.root.id]); S.missed = new Set(); S.stats = { ok: 0, miss: 0 };
+  $('trDoneModal').classList.add('hidden');
+  $('trStudyHeader').classList.add('hidden'); $('trHub').classList.add('hidden');
+  const prog = $('trStudyProgress'); prog.classList.remove('hidden'); prog.classList.add('mode-blank');
+  studyView.clear();
+  studyView.onTarget = () => studyView.centerOnNode(S.curParent && S.curParent.id);
+  blankRender(false);
+  blankAsk();
+}
+function blankRender(animate) {
+  const layout = computeLayout(pruneRevealed(S.tree.root), S.tree.title);
+  studyView.stateOf = id => S.missed.has(id) ? 'missed' : 'done';
+  studyView.sync(layout, fillBlank, animate);
+  $('trBlankCount').textContent = `맞힌 노드 ${S.revealed.size - 1}`;
+}
+function fillBlank(el, id) {
+  const isRoot = id === S.tree.root.id;
+  const st = isRoot ? 'root' : (S.missed.has(id) ? 'missed' : 'done');
+  if (el.dataset.state === st) return;
+  el.dataset.state = st;
+  const node = S.byId.get(id);
+  el.className = 'node ' + st; el.replaceChildren(); el.removeAttribute('title');
+  addText(el, isRoot ? S.tree.title : node.label);
+  attachImage(el, node);
+}
+function blankAsk() {
+  const unit = S.units[S.index];
+  S.cur = unit.nodes; S.curParent = unit.parent;
+  S.canAdvance = false; S.mistake = false; S.locked = false;
+  const label = unit.parent.id === S.tree.root.id ? S.tree.title : unit.parent.label;
+  $('trBlankCaption').innerHTML = `<b>${escapeHtml(label)}</b> 의 하위 항목`;
+  const inp = $('trBlankInput');
+  inp.value = ''; inp.disabled = false; inp.classList.remove('wrong');
+  setFeedback('', '');
+  studyView.setAsking(unit.parent.id);
+  studyView.centerOnNode(unit.parent.id, true);
+  setTimeout(() => inp.focus(), 0);
+}
+function blankSubmit() {
+  if (S.mode !== 'blank' || S.locked || S.canAdvance) return;
+  const inp = $('trBlankInput'), v = inp.value;
+  if (!v.trim()) return;
+  const remaining = S.cur.filter(n => !S.revealed.has(n.id));
+  const hit = remaining.find(n => singleMatch(v, n.label));
+  if (!hit) {
+    S.mistake = true; setFeedback('bad', '다시 시도해보세요');
+    inp.classList.remove('wrong'); void inp.offsetWidth; inp.classList.add('wrong');
+    return;
+  }
+  S.revealed.add(hit.id); inp.value = '';
+  setFeedback('ok', '정답입니다');
+  if (remaining.length === 1) {
+    S.cur.forEach(finalizeNodeOutcome);
+    if (S.mistake) S.stats.miss += S.cur.length; else S.stats.ok += S.cur.length;
+    S.locked = true; inp.disabled = true;
+    blankRender(true);
+    studyView.setAsking(S.curParent.id);
+    const tk = S.token;
+    setTimeout(() => { if (tk === S.token && S.mode === 'blank') blankNext(); }, 560);
+  } else {
+    blankRender(true);
+    studyView.setAsking(S.curParent.id);
+  }
+}
+function blankSkip() {
+  if (S.mode !== 'blank' || S.locked || S.canAdvance) return;
+  const remaining = S.cur.filter(n => !S.revealed.has(n.id));
+  remaining.forEach(n => { S.revealed.add(n.id); S.missed.add(n.id); });
+  S.cur.forEach(n => markNodeMistake(S.tree.id, n.id));
+  S.stats.miss += S.cur.length;
+  setFeedback('warn', '정답: ' + remaining.map(n => n.label).join(', '));
+  const inp = $('trBlankInput'); inp.disabled = true; inp.blur();
+  S.canAdvance = true;
+  blankRender(true);
+  studyView.setAsking(S.curParent.id);
+}
+function blankNext() {
+  if (S.index < S.units.length - 1) { S.index++; blankAsk(); return; }
+  S.locked = true;
+  $('trDoneStats').innerHTML =
+    `<b>${S.revealed.size - 1}개 노드를 모두 이었습니다</b>` +
+    `<span class="ok">한 번에 맞힘 ${S.stats.ok}</span> &nbsp;·&nbsp; <span class="bad">오답 ${S.stats.miss}</span>`;
+  $('trDoneModal').classList.remove('hidden');
+}
+$('trBlankInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.stopPropagation(); blankSubmit(); }
+});
+$('btnDoneHub').addEventListener('click', showHub);
+$('btnDoneAgain').addEventListener('click', beginBlankSession);
+
+/* 키보드: Esc = 건너뛰기, Enter = (정답 확인 후/건너뛴 뒤) 다음으로 */
+document.addEventListener('keydown', e => {
+  if ($('trStudyProgress').classList.contains('hidden')) return;
+  if (!$('trDoneModal').classList.contains('hidden')) return;
+  if (!$('trImgLightbox').classList.contains('hidden')) return;
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    if (S.mode === 'blank') blankSkip(); else if (!S.canAdvance) skipCurrentUnit();
+  } else if (e.key === 'Enter') {
+    if (!S.canAdvance) return;
+    e.preventDefault();
+    if (S.mode === 'blank') blankNext(); else goToNextStudyStep();
+  }
+});
+
+/* =========================================================================
+ * 14. 마크다운 가져오기 (파일 선택 / 드래그 앤 드롭)
+ * ========================================================================= */
+async function importMdFiles(fileList) {
+  const files = Array.from(fileList || []).filter(f => /\.(md|markdown|txt)$/i.test(f.name));
+  if (!files.length) { toast('마크다운(.md) 파일을 선택해주세요'); return; }
+  const titleOf = (file, text) => {
+    let t = file.name.replace(/\.(md|markdown|txt)$/i, '').trim();
+    const h1 = text.match(/^#\s+(.+)$/m);
+    if (h1 && (!t || t.toLowerCase().startsWith('untitled') || t === '새 구조도')) t = h1[1].trim();
+    return t;
+  };
+  if (!screenEdit.classList.contains('hidden') && files.length === 1) {
+    try {
+      const text = await files[0].text();
+      $('trTitleInput').value = titleOf(files[0], text); $('trOutlineInput').value = text;
+      const nr = parseOutlineToTree(text); mergeTreeAttachments(nr, treeEdit.root);
+      treeEdit.root = nr; renderTreePreview(); return;
+    } catch (e) { console.error(e); }
+  }
+  const base = currentScopeItems().length; const made = [];
+  for (let i = 0; i < files.length; i++) {
+    try {
+      const text = await files[i].text();
+      const title = titleOf(files[i], text) || `구조도 ${base + made.length + 1}`;
+      const id = genTreeId();
+      TREES[id] = { id, title, createdAt: Date.now() + i, outline: text, root: parseOutlineToTree(text),
+        folderId: currentFolderId, order: (base + 1 + made.length) * 10 };
+      made.push(title);
+    } catch (err) { console.error('파일 처리 실패:', files[i].name, err); }
+  }
+  if (made.length) {
+    await saveTrees(); showScreen(screenList); renderTreeList();
+    toast(made.length === 1 ? `"${made[0]}" 구조도를 만들었습니다` : `${made.length}개의 구조도를 만들었습니다`);
+  }
+}
+
+/* =========================================================================
+ * 15. MD 내보내기 / 폴더·ZIP 일괄 불러오기
+ * ========================================================================= */
+function treeToMd(tree) {
+  const lines = [];
+  const withBrackets = n => {
+    const m = n.blankMask;
+    if (!m || m === defaultBlankMask(n.label)) return n.label;
+    let out = '', open = false;
+    [...n.label].forEach((ch, i) => {
+      const b = m[i] === '1';
+      if (b && !open) { out += '[['; open = true; }
+      if (!b && open) { out += ']]'; open = false; }
+      out += ch;
+    });
+    return out + (open ? ']]' : '');
+  };
+  (function walk(n, d) { n.children.forEach(c => { lines.push('\t'.repeat(d) + '- ' + withBrackets(c)); walk(c, d + 1); }); })(tree.root, 0);
+  return lines.join('\n') + '\n';
+}
+const safeName = t => (t || '구조도').replace(/[\\/:*?"<>|]/g, '_').trim() || '구조도';
+function downloadBlob(blob, name) {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+function exportTreeMd(id) {
+  const t = TREES[id]; if (!t) return;
+  downloadBlob(new Blob([treeToMd(t)], { type: 'text/markdown;charset=utf-8' }), safeName(t.title) + '.md');
+  toast(`"${t.title}" 내보냈습니다`);
+}
+/* 최소 ZIP(무압축) 작성 */
+const CRC_T = (() => { const t = []; for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+const crc32 = b => { let c = ~0; for (let i = 0; i < b.length; i++) c = CRC_T[(c ^ b[i]) & 255] ^ (c >>> 8); return ~c >>> 0; };
+function makeZip(entries) {
+  const enc = new TextEncoder(), parts = [], cd = []; let off = 0;
+  const u16 = v => [v & 255, v >> 8 & 255], u32 = v => [v & 255, v >> 8 & 255, v >> 16 & 255, v >> 24 & 255];
+  for (const e of entries) {
+    const name = enc.encode(e.name), data = enc.encode(e.text), crc = crc32(data);
+    const h = new Uint8Array([0x50,0x4b,3,4, 20,0, 0,8, 0,0, 0,0,0,0, ...u32(crc), ...u32(data.length), ...u32(data.length), ...u16(name.length), 0,0]);
+    parts.push(h, name, data);
+    cd.push(new Uint8Array([0x50,0x4b,1,2, 20,0,20,0, 0,8, 0,0, 0,0,0,0, ...u32(crc), ...u32(data.length), ...u32(data.length), ...u16(name.length), 0,0,0,0,0,0,0,0,0,0,0,0, ...u32(off)]), name);
+    off += h.length + name.length + data.length;
+  }
+  const cdSize = cd.reduce((a, b) => a + b.length, 0);
+  parts.push(...cd, new Uint8Array([0x50,0x4b,5,6,0,0,0,0, ...u16(entries.length), ...u16(entries.length), ...u32(cdSize), ...u32(off), 0,0]));
+  return new Blob(parts, { type: 'application/zip' });
+}
+function exportAllMd() {
+  const used = new Set(), entries = [];
+  Object.values(TREES).forEach(t => {
+    const dir = t.folderId && TREE_FOLDERS[t.folderId] ? safeName(TREE_FOLDERS[t.folderId].name) + '/' : '';
+    let name = dir + safeName(t.title), n = 1, full = name;
+    while (used.has(full)) full = `${name} (${++n})`;
+    used.add(full); entries.push({ name: full + '.md', text: treeToMd(t) });
+  });
+  if (!entries.length) { toast('내보낼 구조도가 없습니다'); return; }
+  downloadBlob(makeZip(entries), 'trees.zip'); toast(`${entries.length}개를 ZIP으로 내보냈습니다`);
+}
+/* ZIP 읽기 (무압축 + deflate) */
+async function readZip(file) {
+  const buf = new Uint8Array(await file.arrayBuffer()), dv = new DataView(buf.buffer), out = [];
+  let eocd = -1; for (let i = buf.length - 22; i >= 0; i--) if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+  if (eocd < 0) return out;
+  let p = dv.getUint32(eocd + 16, true); const cnt = dv.getUint16(eocd + 10, true), dec = new TextDecoder();
+  for (let i = 0; i < cnt; i++) {
+    const method = dv.getUint16(p + 10, true), csz = dv.getUint32(p + 20, true), nl = dv.getUint16(p + 28, true),
+      el = dv.getUint16(p + 30, true), cl = dv.getUint16(p + 32, true), lo = dv.getUint32(p + 42, true);
+    const name = dec.decode(buf.subarray(p + 46, p + 46 + nl)); p += 46 + nl + el + cl;
+    if (!/\.(md|markdown|txt)$/i.test(name) || name.startsWith('__MACOSX')) continue;
+    const ds = lo + 30 + dv.getUint16(lo + 26, true) + dv.getUint16(lo + 28, true); let data = buf.subarray(ds, ds + csz);
+    if (method === 8) data = new Uint8Array(await new Response(new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer());
+    out.push({ path: name, text: dec.decode(data) });
+  }
+  return out;
+}
+/* 일괄 불러오기: 파일 여러 개 / 폴더 / ZIP → 하위 폴더는 앱 폴더로 */
+async function importBatch(fileList) {
+  const items = [];
+  for (const f of Array.from(fileList || [])) {
+    if (/\.zip$/i.test(f.name)) { try { items.push(...await readZip(f)); } catch (e) { console.error(e); toast('ZIP을 읽지 못했습니다'); } }
+    else if (/\.(md|markdown|txt)$/i.test(f.name)) items.push({ path: f.webkitRelativePath || f.name, text: await f.text() });
+  }
+  if (!items.length) { toast('불러올 MD 파일이 없습니다'); return; }
+  const folderIds = {}, baseOrder = currentScopeItems().length; let made = 0;
+  for (const it of items) {
+    const segs = it.path.split('/').filter(Boolean), file = segs.pop();
+    let fid = currentFolderId;
+    if (segs.length && !currentFolderId) {
+      const fname = segs[segs.length - 1];
+      if (!folderIds[fname]) {
+        const ex = Object.values(TREE_FOLDERS).find(x => x.name === fname);
+        if (ex) folderIds[fname] = ex.id;
+        else { const id = genFolderId(); TREE_FOLDERS[id] = { id, name: fname, createdAt: Date.now(), order: (getRootItems().length + 1) * 10 }; folderIds[fname] = id; }
+      }
+      fid = folderIds[fname];
+    }
+    const h1 = it.text.match(/^#\s+(.+)$/m);
+    let title = file.replace(/\.(md|markdown|txt)$/i, '').trim() || (h1 && h1[1].trim()) || '구조도';
+    const id = genTreeId();
+    TREES[id] = { id, title, createdAt: Date.now() + made, outline: it.text, root: parseOutlineToTree(it.text), folderId: fid, order: (baseOrder + ++made) * 10 };
+  }
+  await saveTrees(); await saveTreeFolders(); showScreen(screenList); renderTreeList();
+  toast(`${made}개의 구조도를 불러왔습니다`);
+}
+importMdFiles = (orig => async fl => {
+  const arr = Array.from(fl || []);
+  if (arr.length > 1 || arr.some(f => /\.zip$/i.test(f.name) || f.webkitRelativePath)) return importBatch(arr);
+  return orig(fl);
+})(importMdFiles);
+$('btnTrExportAll').addEventListener('click', exportAllMd);
+$('btnTrImportDir').addEventListener('click', () => $('trMdDirInput').click());
+$('trMdDirInput').addEventListener('change', async e => { if (e.target.files.length) { await importMdFiles(e.target.files); e.target.value = ''; } });
+
+$('btnTrImportMd').addEventListener('click', () => $('trMdFileInput').click());
+$('trMdFileInput').addEventListener('change', async e => {
+  if (e.target.files && e.target.files.length) { await importMdFiles(e.target.files); e.target.value = ''; }
+});
+let dragDepth = 0;
+const dropOverlay = $('dropOverlay');
+const hasFiles = e => e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files');
+window.addEventListener('dragenter', e => { if (!hasFiles(e)) return; e.preventDefault(); dragDepth++; dropOverlay.classList.add('active'); });
+window.addEventListener('dragleave', e => { if (!hasFiles(e)) return; dragDepth = Math.max(0, dragDepth - 1); if (!dragDepth) dropOverlay.classList.remove('active'); });
+window.addEventListener('dragover', e => { if (hasFiles(e)) { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; } });
+window.addEventListener('drop', async e => {
+  if (!hasFiles(e)) return;
+  e.preventDefault(); dragDepth = 0; dropOverlay.classList.remove('active');
+  if (e.dataTransfer.files.length) await importMdFiles(e.dataTransfer.files);
+});
+
+/* =========================================================================
+ * 15. 초기화
+ * ========================================================================= */
+async function init() {
+  [TREES, TREE_WRONG, TREE_FOLDERS] = await Promise.all([
+    loadFromStorage(KEY_TREES), loadFromStorage(KEY_WRONG), loadFromStorage(KEY_FOLDERS),
+  ]).then(r => r.map(v => v || {}));
+
+  const trees = Object.values(TREES).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+  let ord = 10;
+  trees.forEach(t => {
+    if (t.folderId === undefined) t.folderId = null;
+    if (t.order === undefined || t.order === null) t.order = ord;
+    ord += 10;
+  });
+  let fo = 10;
+  Object.values(TREE_FOLDERS).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0)).forEach(f => {
+    if (f.order === undefined || f.order === null) f.order = fo;
+    fo += 10;
+  });
+  let changed = false;
+  trees.forEach(t => { if (pruneStaleWrongEntries(t)) changed = true; });
+  if (changed) await saveTreeWrong();
+
+  renderTreeList(); showScreen(screenList);
+}
+init();
+</script>
+</body>
+</html>
