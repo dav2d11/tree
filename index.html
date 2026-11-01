@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>구조도 암기</title>
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="구조도 암기">
+<meta name="theme-color" content="#090b10">
 <style>
 :root{
   --bg:#090b10; --panel:#12151c; --panel2:#181c26; --line:#232937; --line2:#2e3649;
@@ -288,6 +295,88 @@ kbd{font:inherit;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:
 .drop-sub{font-size:13px;color:var(--sub);line-height:1.6;}
 @media (prefers-reduced-motion:reduce){ *{animation:none !important;transition:none !important;} }
 
+
+
+/* =========================================================================
+ * 즐겨찾기 섹션
+ * ========================================================================= */
+.fav-section{margin-top:36px;margin-bottom:4px;}
+.fav-head{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:6px 2px 0;}
+.fav-head h3{margin:0;font-size:14px;font-weight:700;color:var(--warn);letter-spacing:-.01em;}
+.fav-icon{color:var(--warn);flex-shrink:0;}
+.fav-empty{color:var(--mute);font-size:13px;padding:6px 4px;}
+.fav-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;}
+.fav-card{
+  background:linear-gradient(160deg,#1e1c2e,#161424);
+  border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;
+  position:relative;cursor:pointer;transition:background .15s,transform .15s;border:1px solid rgba(255,198,74,.12);
+  box-shadow:0 2px 12px rgba(0,0,0,.3);
+}
+.fav-card:hover{background:linear-gradient(160deg,#232040,#1a1728);transform:translateY(-2px);}
+.fav-card-icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:rgba(255,198,74,.12);color:var(--warn);flex-shrink:0;}
+.fav-card-body{flex:1;min-width:0;}
+.fav-card{padding-right:50px !important;}
+.fav-card .btn-fav{top:50% !important;transform:translateY(-50%);right:12px !important;}
+.fav-card-title{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.01em;}
+.fav-card-meta{font-size:11px;color:var(--sub);margin-top:2px;}
+.fav-card-actions{display:flex;gap:6px;flex-shrink:0;}
+.fav-card-actions .btn{padding:7px 10px;font-size:12px;}
+.fav-divider{border:none;border-top:1px solid var(--line);margin:16px 0;}
+
+/* 카드 우상단 별(즐겨찾기) 버튼 */
+.card{position:relative;}
+.btn-fav{
+  position:absolute !important;top:10px;right:10px;
+  padding:5px !important;width:28px;height:28px;min-height:unset !important;
+  background:transparent !important;box-shadow:none !important;border-radius:8px !important;
+  color:var(--mute) !important;display:flex;align-items:center;justify-content:center;z-index:2;
+}
+.btn-fav svg{width:15px;height:15px;}
+.btn-fav.active{color:var(--warn) !important;}
+.btn-fav:hover{color:var(--warn) !important;background:rgba(255,198,74,.12) !important;}
+
+/* 선택 모드 */
+.sel-check{
+  position:absolute;top:50%;left:14px;transform:translateY(-50%);
+  width:22px;height:22px;border-radius:50%;
+  border:2px solid var(--line2);background:var(--panel2);
+  display:none;align-items:center;justify-content:center;
+  pointer-events:none;transition:border-color .15s,background .15s;flex-shrink:0;
+}
+.select-mode .card .sel-check{display:flex;}
+.select-mode .card{cursor:pointer;padding-left:48px;}
+.card.selected .sel-check{background:var(--accent);border-color:var(--accent);}
+.card.selected .sel-check::after{content:'';display:block;width:5px;height:9px;border:2.5px solid #0a0d1c;border-top:none;border-left:none;transform:rotate(45deg) translate(-1px,-1px);}
+.card.selected{box-shadow:0 0 0 2px var(--accent),var(--sh);}
+.select-mode .btn-fav{display:none !important;}
+.select-mode .card-actions,.select-mode #trFavSection,.select-mode #trFavDivider{display:none !important;}
+.select-mode .card{cursor:pointer !important;}
+.select-mode .card.folder .card-meta{margin-bottom:0;}
+.select-mode #btnTrSelect{background:var(--accent-bg);color:var(--accent);}
+.sel-actions .btn:disabled{opacity:.35;pointer-events:none;}
+.sel-actions .btn.hidden{display:none !important;}
+
+/* 선택 모드 액션 바 */
+.sel-bar{
+  display:none;position:sticky;bottom:16px;z-index:100;
+  background:rgba(22,26,36,.95);backdrop-filter:blur(16px);
+  border-radius:18px;padding:14px 16px;
+  box-shadow:0 8px 36px rgba(0,0,0,.6);
+  flex-direction:column;gap:10px;margin-top:16px;
+}
+.sel-bar.visible{display:flex;}
+.sel-bar-top{display:flex;align-items:center;gap:8px;}
+.sel-bar-label{flex:1;font-size:13px;font-weight:700;color:var(--sub);}
+.sel-bar-label b{color:var(--text);}
+.sel-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.sel-actions .btn{flex:1;min-width:80px;}
+@media (max-width:600px){
+  .sel-bar{bottom:calc(12px + env(safe-area-inset-bottom));border-radius:20px;}
+  .sel-actions .btn{min-height:44px;font-size:13px;}
+  .select-mode .card{padding-left:46px;}
+}
+
+
 /* =========================================================================
  * v2 디자인: 테두리 제거 · 면(tonal) 위주 · 부드러운 그림자 / 모바일(iPhone 12 mini 375px)
  * ========================================================================= */
@@ -385,6 +474,10 @@ body{background:radial-gradient(900px 460px at 50% -160px,#1a2340 0%,transparent
     <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></symbol>
     <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
     <symbol id="i-up" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></symbol>
+    <symbol id="i-star-fill" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" style="fill:currentColor;stroke:none"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></symbol>
+    <symbol id="i-select" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></symbol>
   </defs>
 </svg>
 
@@ -418,10 +511,38 @@ body{background:radial-gradient(900px 460px at 50% -160px,#1a2340 0%,transparent
         <button class="btn" id="btnTrImportMd"><svg class="ic"><use href="#i-import"/></svg>MD 불러오기</button>
         <button class="btn" id="btnTrImportDir"><svg class="ic"><use href="#i-folder"/></svg>폴더 불러오기</button>
         <button class="btn" id="btnTrExportAll"><svg class="ic"><use href="#i-out"/></svg>전체 내보내기</button>
+        <button class="btn" id="btnTrSelect"><svg class="ic"><use href="#i-select"/></svg>선택</button>
         <input type="file" id="trMdFileInput" accept=".md,.markdown,.txt,.zip" multiple class="hidden">
         <input type="file" id="trMdDirInput" webkitdirectory directory multiple class="hidden">
       </div>
+
+      <!-- 즐겨찾기 섹션 (루트에서만 표시) -->
+      <div class="fav-section" id="trFavSection">
+        <div class="fav-head">
+          <svg class="ic fav-icon"><use href="#i-star-fill"/></svg>
+          <h3>즐겨찾기</h3>
+        </div>
+        <div class="fav-grid" id="trFavGrid"></div>
+      </div>
+      <hr class="fav-divider" id="trFavDivider">
+
       <div class="grid" id="trGrid"></div>
+
+      <!-- 선택 모드 액션 바 -->
+      <div class="sel-bar" id="trSelBar">
+        <div class="sel-bar-top">
+          <span class="sel-bar-label"><b id="trSelCount">0</b>개 선택됨</span>
+          <button class="btn btn-sm" id="btnTrSelAll">전체 선택</button>
+          <button class="btn btn-sm" id="btnTrSelCancel">취소</button>
+        </div>
+        <div class="sel-actions" id="trSelActions">
+          <button class="btn btn-sm" id="btnSelBlank"><svg class="ic"><use href="#i-blank"/></svg>백지</button>
+          <button class="btn btn-sm" id="btnSelExport"><svg class="ic"><use href="#i-out"/></svg>내보내기</button>
+          <button class="btn btn-sm hidden" id="btnSelUnfile"><svg class="ic"><use href="#i-out"/></svg>폴더에서 빼기</button>
+          <button class="btn btn-sm btn-danger" id="btnSelDelete"><svg class="ic"><use href="#i-trash"/></svg>삭제</button>
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -561,7 +682,8 @@ function toast(msg) {
 const KEY_TREES = 'quiz_trees';
 const KEY_WRONG = 'quiz_tree_wrong_nodes';
 const KEY_FOLDERS = 'quiz_tree_folders';
-let TREES = {}, TREE_WRONG = {}, TREE_FOLDERS = {};
+const KEY_FAV = 'quiz_tree_favorites';
+let TREES = {}, TREE_WRONG = {}, TREE_FOLDERS = {}, TREE_FAV = new Set();
 // TreeNode = { id, label, children, blankMask, image }
 
 const DB_NAME = 'TypingQuizDB', DB_VERSION = 1, STORE = 'keyval';
@@ -619,6 +741,7 @@ async function saveToStorage(key, obj) {
 const saveTrees = () => saveToStorage(KEY_TREES, TREES);
 const saveTreeWrong = () => saveToStorage(KEY_WRONG, TREE_WRONG);
 const saveTreeFolders = () => saveToStorage(KEY_FOLDERS, TREE_FOLDERS);
+const saveTreeFav = () => saveToStorage(KEY_FAV, Array.from(TREE_FAV));
 let wrongTimer = null;
 function saveTreeWrongSoon() { clearTimeout(wrongTimer); wrongTimer = setTimeout(() => { wrongTimer = null; saveTreeWrong(); }, 400); }
 window.addEventListener('pagehide', () => { if (wrongTimer) { clearTimeout(wrongTimer); wrongTimer = null; saveTreeWrong(); } });
@@ -1142,6 +1265,55 @@ function makeDraggable(el, type, id, isFolderTarget) {
   });
 }
 
+function renderFavSection() {
+  const favGrid = $('trFavGrid');
+  const favSection = $('trFavSection');
+  const favDivider = $('trFavDivider');
+  // 즐겨찾기는 루트(전체 목록)에서만 표시
+  if (currentFolderId) {
+    favSection.classList.add('hidden');
+    favDivider.classList.add('hidden');
+    return;
+  }
+  const favIds = Array.from(TREE_FAV).filter(id => TREES[id]);
+  if (!favIds.length) {
+    favSection.classList.add('hidden');
+    favDivider.classList.add('hidden');
+    return;
+  }
+  favSection.classList.remove('hidden');
+  favDivider.classList.remove('hidden');
+  const frag = document.createDocumentFragment();
+  favIds.forEach(id => {
+    const tree = TREES[id];
+    const nodeCount = flattenTreeDFS(tree.root).length;
+    const wrong = getWrongCount(tree.id);
+    const card = document.createElement('div');
+    card.className = 'fav-card';
+    card.innerHTML = `
+      <div class="fav-card-body">
+        <div class="fav-card-title">${escapeHtml(tree.title)}</div>
+        <div class="fav-card-meta">노드 ${nodeCount}개${wrong ? ` · 오답 ${wrong}개` : ''}</div>
+      </div>
+      <div class="fav-card-actions">
+        <button class="btn btn-sm btn-primary" data-act="study" title="학습 시작">${icon('play')}학습</button>
+        <button class="btn btn-sm" data-act="edit" title="편집">${icon('edit')}편집</button>
+      </div>
+      <button class="btn btn-sm btn-fav active icon-only" data-act="unfav" title="즐겨찾기 해제">${icon('star-fill')}</button>`;
+    card.querySelector('[data-act="study"]').onclick = e => { e.stopPropagation(); openTreeStudy(tree.id, 'hub'); };
+    card.querySelector('[data-act="edit"]').onclick = e => { e.stopPropagation(); openTreeEditor(tree.id); };
+    card.querySelector('[data-act="unfav"]').onclick = async e => {
+      e.stopPropagation();
+      TREE_FAV.delete(tree.id);
+      await saveTreeFav();
+      renderFavSection(); renderTreeList();
+    };
+    card.onclick = () => openTreeStudy(tree.id, 'hub');
+    frag.appendChild(card);
+  });
+  favGrid.replaceChildren(frag);
+}
+
 function renderTreeList() {
   const grid = $('trGrid'), back = $('btnTrFolderBack'), title = $('trListTitle');
   const folder = currentFolderId && TREE_FOLDERS[currentFolderId];
@@ -1149,14 +1321,20 @@ function renderTreeList() {
   if (currentFolderId) { back.classList.remove('hidden'); title.textContent = folder.name; }
   else { back.classList.add('hidden'); title.textContent = '내 구조도'; }
 
+  renderFavSection();
+
   const items = currentScopeItems();
   if (!items.length) {
     grid.innerHTML = `<div class="empty-msg">${currentFolderId ? '비어 있음' : '구조도 없음'}</div>`;
+    SEL.clear(); if (selectMode) syncSelUI();
     return;
   }
   const frag = document.createDocumentFragment();
   items.forEach(it => frag.appendChild(it.type === 'folder' ? buildFolderCard(it.obj) : buildTreeCard(it.obj)));
   grid.replaceChildren(frag);
+  const ids = new Set(items.map(it => it.id));
+  Array.from(SEL).forEach(id => { if (!ids.has(id)) SEL.delete(id); });
+  if (selectMode) syncSelUI();
 }
 
 function buildFolderCard(folder) {
@@ -1164,60 +1342,136 @@ function buildFolderCard(folder) {
   const card = document.createElement('div');
   card.className = 'card folder';
   card.innerHTML = `
+    <div class="sel-check"></div>
     <div class="card-title">${icon('folder', 'lg')}<span>${escapeHtml(folder.name)}</span></div>
     <div class="card-meta"><span>구조도 ${count}개</span></div>
     <div class="card-actions">
       <button class="btn btn-sm btn-primary" data-act="open">열기</button>
       <button class="btn btn-sm" data-act="rename">${icon('edit')}이름 변경</button>
-      <button class="btn btn-sm btn-danger icon-only" data-act="del" title="삭제">${icon('trash')}</button>
     </div>`;
+  card.dataset.sid = folder.id;
   card.querySelector('[data-act="open"]').onclick = () => { currentFolderId = folder.id; renderTreeList(); };
   card.querySelector('[data-act="rename"]').onclick = async () => {
     const name = prompt('폴더 이름을 입력하세요', folder.name);
     if (!name || !name.trim()) return;
     folder.name = name.trim(); await saveTreeFolders(); renderTreeList();
   };
-  card.querySelector('[data-act="del"]').onclick = async () => {
-    const items = getFolderItems(folder.id);
-    if (!confirm(`"${folder.name}" 폴더를 삭제할까요?${items.length ? ` (안의 구조도 ${items.length}개는 전체 목록으로 이동됩니다)` : ''}`)) return;
-    const rootN = getRootItems().length;
-    items.forEach((it, i) => { it.obj.folderId = null; it.obj.order = (rootN + i + 1) * 10; });
-    delete TREE_FOLDERS[folder.id];
-    await saveTrees(); await saveTreeFolders(); renderTreeList();
-  };
+  card.addEventListener('click', e => { if (selectMode) { e.preventDefault(); toggleSel(folder.id); } });
   makeDraggable(card, 'folder', folder.id, true);
   return card;
 }
 
 function buildTreeCard(tree) {
   const nodeCount = flattenTreeDFS(tree.root).length, wrong = getWrongCount(tree.id);
+  const isFav = TREE_FAV.has(tree.id);
+  // 루트 화면에서는 즐겨찾기 섹션에 별 버튼이 이미 있으므로, 즐겨찾기된 카드는 별을 숨김 (둘 중 하나만 표시)
+  const showStar = !(isFav && !currentFolderId);
   const card = document.createElement('div');
   card.className = 'card';
+  card.dataset.sid = tree.id;
   card.innerHTML = `
+    <div class="sel-check"></div>
     <div class="card-title">${escapeHtml(tree.title)}</div>
     <div class="card-meta"><span>노드 ${nodeCount}개</span>${wrong ? `<span class="meta-wrong">오답 ${wrong}개</span>` : ''}</div>
     <div class="card-actions">
       <button class="btn btn-sm btn-primary" data-act="study">${icon('play')}학습</button>
-      <button class="btn btn-sm" data-act="blank">${icon('blank')}백지</button>
       <button class="btn btn-sm" data-act="edit">${icon('edit')}편집</button>
-      <button class="btn btn-sm icon-only" data-act="export" title="MD로 내보내기">${icon('out')}</button>
-      <button class="btn btn-sm btn-danger icon-only" data-act="del" title="삭제">${icon('trash')}</button>
     </div>
-    ${currentFolderId ? `<button class="btn btn-sm btn-block" data-act="unfile">${icon('out')}폴더에서 빼기</button>` : ''}`;
+    ${showStar ? `<button class="btn btn-sm icon-only btn-fav ${isFav ? 'active' : ''}" data-act="fav" title="${isFav ? '즐겨찾기 해제' : '즐겨찾기 추가'}">${icon(isFav ? 'star-fill' : 'star')}</button>` : ''}`;
   card.querySelector('[data-act="study"]').onclick = () => openTreeStudy(tree.id, 'hub');
-  card.querySelector('[data-act="blank"]').onclick = () => openTreeStudy(tree.id, 'blank');
   card.querySelector('[data-act="edit"]').onclick = () => openTreeEditor(tree.id);
-  card.querySelector('[data-act="export"]').onclick = () => exportTreeMd(tree.id);
-  card.querySelector('[data-act="del"]').onclick = async () => {
-    if (!confirm(`"${tree.title}" 구조도를 삭제할까요? (오답 기록도 함께 삭제됩니다)`)) return;
-    delete TREES[tree.id]; delete TREE_WRONG[tree.id];
-    await saveTrees(); await saveTreeWrong(); renderTreeList();
+  const fav = card.querySelector('[data-act="fav"]');
+  if (fav) fav.onclick = async () => {
+    if (TREE_FAV.has(tree.id)) { TREE_FAV.delete(tree.id); toast(`"${tree.title}" 즐겨찾기에서 제거했습니다`); }
+    else { TREE_FAV.add(tree.id); toast(`"${tree.title}" 즐겨찾기에 추가했습니다 ★`); }
+    await saveTreeFav();
+    renderTreeList();
   };
-  const unfile = card.querySelector('[data-act="unfile"]');
-  if (unfile) unfile.onclick = () => removeTreeFromFolder(tree.id);
+  card.addEventListener('click', e => { if (selectMode) { e.preventDefault(); toggleSel(tree.id); } });
   makeDraggable(card, 'tree', tree.id, false);
   return card;
 }
+
+/* ---- 선택 모드 (iOS 파일 앱 방식) ---- */
+let selectMode = false;
+const SEL = new Set();
+const selItems = () => Array.from(SEL).map(id => TREES[id] ? { type: 'tree', obj: TREES[id] } : TREE_FOLDERS[id] ? { type: 'folder', obj: TREE_FOLDERS[id] } : null).filter(Boolean);
+function setSelectMode(on) {
+  selectMode = on; SEL.clear();
+  screenList.classList.toggle('select-mode', on);
+  $('trSelBar').classList.toggle('visible', on);
+  renderTreeList();
+}
+function toggleSel(id) {
+  if (SEL.has(id)) SEL.delete(id); else SEL.add(id);
+  syncSelUI();
+}
+function syncSelUI() {
+  document.querySelectorAll('#trGrid .card').forEach(c => c.classList.toggle('selected', SEL.has(c.dataset.sid)));
+  const items = selItems(), trees = items.filter(i => i.type === 'tree'), folders = items.filter(i => i.type === 'folder');
+  $('trSelCount').textContent = items.length;
+  $('btnSelBlank').disabled = !(trees.length === 1 && !folders.length);
+  $('btnSelExport').disabled = !items.length;
+  $('btnSelDelete').disabled = !items.length;
+  const un = $('btnSelUnfile');
+  un.classList.toggle('hidden', !currentFolderId);
+  un.disabled = !trees.length;
+  const all = document.querySelectorAll('#trGrid .card').length;
+  $('btnTrSelAll').textContent = all && SEL.size === all ? '선택 해제' : '전체 선택';
+}
+$('btnTrSelect').addEventListener('click', () => setSelectMode(!selectMode));
+$('btnTrSelCancel').addEventListener('click', () => setSelectMode(false));
+$('btnTrSelAll').addEventListener('click', () => {
+  const cards = Array.from(document.querySelectorAll('#trGrid .card'));
+  if (cards.length && SEL.size === cards.length) SEL.clear(); else cards.forEach(c => SEL.add(c.dataset.sid));
+  syncSelUI();
+});
+$('btnSelBlank').addEventListener('click', () => {
+  const t = selItems().find(i => i.type === 'tree'); if (!t) return;
+  const id = t.obj.id; setSelectMode(false); openTreeStudy(id, 'blank');
+});
+$('btnSelExport').addEventListener('click', () => {
+  const trees = new Map();
+  selItems().forEach(i => {
+    if (i.type === 'tree') trees.set(i.obj.id, i.obj);
+    else getFolderItems(i.obj.id).forEach(x => trees.set(x.obj.id, x.obj));
+  });
+  if (!trees.size) { toast('내보낼 구조도가 없습니다'); return; }
+  if (trees.size === 1 && !selItems().some(i => i.type === 'folder')) { exportTreeMd(Array.from(trees.keys())[0]); return; }
+  const used = new Set(), entries = [];
+  trees.forEach(t => {
+    const dir = t.folderId && TREE_FOLDERS[t.folderId] ? safeName(TREE_FOLDERS[t.folderId].name) + '/' : '';
+    let name = dir + safeName(t.title), n = 1, full = name;
+    while (used.has(full)) full = `${name} (${++n})`;
+    used.add(full); entries.push({ name: full + '.md', text: treeToMd(t) });
+  });
+  downloadBlob(makeZip(entries), 'trees.zip'); toast(`${entries.length}개를 ZIP으로 내보냈습니다`);
+});
+$('btnSelUnfile').addEventListener('click', async () => {
+  const trees = selItems().filter(i => i.type === 'tree'); if (!trees.length) return;
+  let base = getRootItems().length;
+  trees.forEach((i, k) => { i.obj.folderId = null; i.obj.order = (base + k + 1) * 10; });
+  await saveTrees(); toast(`${trees.length}개를 폴더에서 뺐습니다`);
+  SEL.clear(); renderTreeList();
+});
+$('btnSelDelete').addEventListener('click', async () => {
+  const items = selItems(); if (!items.length) return;
+  const trees = items.filter(i => i.type === 'tree'), folders = items.filter(i => i.type === 'folder');
+  const parts = []; if (trees.length) parts.push(`구조도 ${trees.length}개`); if (folders.length) parts.push(`폴더 ${folders.length}개`);
+  let msg = `선택한 ${parts.join(', ')}를 삭제할까요?`;
+  if (trees.length) msg += ' (오답 기록도 함께 삭제됩니다)';
+  if (folders.length) msg += '\n폴더 안의 구조도는 전체 목록으로 이동됩니다.';
+  if (!confirm(msg)) return;
+  folders.forEach(f => {
+    const kids = getFolderItems(f.obj.id).filter(k => !SEL.has(k.obj.id));
+    let rootN = getRootItems().length;
+    kids.forEach((k, i) => { k.obj.folderId = null; k.obj.order = (rootN + i + 1) * 10; });
+    delete TREE_FOLDERS[f.obj.id];
+  });
+  trees.forEach(t => { delete TREES[t.obj.id]; delete TREE_WRONG[t.obj.id]; TREE_FAV.delete(t.obj.id); });
+  await saveTrees(); await saveTreeWrong(); await saveTreeFav(); await saveTreeFolders();
+  SEL.clear(); renderTreeList();
+});
 
 const btnBack = $('btnTrFolderBack');
 btnBack.addEventListener('click', () => { currentFolderId = null; renderTreeList(); });
@@ -1997,9 +2251,13 @@ window.addEventListener('drop', async e => {
  * 15. 초기화
  * ========================================================================= */
 async function init() {
-  [TREES, TREE_WRONG, TREE_FOLDERS] = await Promise.all([
-    loadFromStorage(KEY_TREES), loadFromStorage(KEY_WRONG), loadFromStorage(KEY_FOLDERS),
-  ]).then(r => r.map(v => v || {}));
+  const [treesData, wrongData, foldersData, favData] = await Promise.all([
+    loadFromStorage(KEY_TREES), loadFromStorage(KEY_WRONG), loadFromStorage(KEY_FOLDERS), loadFromStorage(KEY_FAV),
+  ]);
+  TREES = treesData || {};
+  TREE_WRONG = wrongData || {};
+  TREE_FOLDERS = foldersData || {};
+  TREE_FAV = new Set(Array.isArray(favData) ? favData.filter(id => TREES[id]) : []);
 
   const trees = Object.values(TREES).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
   let ord = 10;
